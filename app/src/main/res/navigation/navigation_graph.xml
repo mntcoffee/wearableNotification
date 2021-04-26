@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="utf-8"?>
+<navigation xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/navigation_graph"
+    app:startDestination="@id/firstNavigationFragment">
+
+    <fragment
+        android:id="@+id/firstNavigationFragment"
+        android:name="com.example.wearablenotification.setup.FirstNavigationFragment"
+        android:label="fragment_first_navigation"
+        tools:layout="@layout/fragment_first_navigation" >
+        <action
+            android:id="@+id/action_firstNavigationFragment_to_secondNavigationFragment"
+            app:destination="@id/secondNavigationFragment" />
+    </fragment>
+    <fragment
+        android:id="@+id/secondNavigationFragment"
+        android:name="com.example.wearablenotification.setup.SecondNavigationFragment"
+        android:label="fragment_second_navigation"
+        tools:layout="@layout/fragment_second_navigation" >
+        <action
+            android:id="@+id/action_secondNavigationFragment_to_previewFragment"
+            app:destination="@id/previewFragment" />
+    </fragment>
+    <fragment
+        android:id="@+id/previewFragment"
+        android:name="com.example.wearablenotification.setup.PreviewFragment"
+        android:label="fragment_preview"
+        tools:layout="@layout/fragment_preview" />
+</navigation>
