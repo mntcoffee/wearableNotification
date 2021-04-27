@@ -1,8 +1,13 @@
 package com.example.wearablenotification.setup
 
 import android.Manifest
+import android.content.Context.SENSOR_SERVICE
 import android.content.Intent
 import android.content.pm.PackageManager
+import android.hardware.Sensor
+import android.hardware.SensorEvent
+import android.hardware.SensorEventListener
+import android.hardware.SensorManager
 import android.os.Bundle
 import android.util.Log
 import androidx.fragment.app.Fragment
@@ -23,9 +28,15 @@ import kotlinx.android.synthetic.main.fragment_preview.view.*
 import java.util.concurrent.ExecutorService
 import java.util.concurrent.Executors
 
-class PreviewFragment : Fragment() {
+class PreviewFragment : Fragment(), SensorEventListener {
 
     private lateinit var cameraExecutor: ExecutorService
+    private lateinit var sensorManager: SensorManager
+    private lateinit var sensor: Sensor
+
+    private var sensorX: Float = 0.0f
+    private var sensorY: Float = 0.0f
+    private var sensorZ: Float = 0.0f
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -38,7 +49,20 @@ class PreviewFragment : Fragment() {
             )
         }
 
+        sensorManager = activity?.getSystemService(SENSOR_SERVICE) as SensorManager
         cameraExecutor = Executors.newSingleThreadExecutor()
+    }
+
+    override fun onResume() {
+        super.onResume()
+
+        sensor = sensorManager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER)
+        sensorManager.registerListener(this, sensor, SensorManager.SENSOR_DELAY_NORMAL)
+    }
+
+    override fun onPause() {
+        super.onPause()
+        sensorManager.unregisterListener(this)
     }
 
     override fun onCreateView(
@@ -53,13 +77,17 @@ class PreviewFragment : Fragment() {
         }
 
         view.start_button_preview_fragment.setOnClickListener {
-            /**
-             * [TODO] check setup
-             */
-            activity.apply {
-                val intent = Intent(this, MainActivity::class.java)
 
-                startActivity(intent)
+            if(checkAngle()) {
+                activity.apply {
+                    val intent = Intent(this, MainActivity::class.java)
+
+                    startActivity(intent)
+                }
+            } else {
+                Toast.makeText(activity,
+                        "取り付け角度が不適切です．角度を再調整してください",
+                        Toast.LENGTH_SHORT).show()
             }
 
         }
@@ -124,11 +152,27 @@ class PreviewFragment : Fragment() {
         cameraExecutor.shutdown()
     }
 
+    override fun onAccuracyChanged(sensor: Sensor?, accuracy: Int) {
+    }
+
+    override fun onSensorChanged(event: SensorEvent?) {
+
+        if(event?.sensor?.type == Sensor.TYPE_ACCELEROMETER) {
+            sensorX = event.values[0]
+            sensorY = event.values[1]
+            sensorZ = event.values[2]
+
+            Log.d(TAG, "X: $sensorX, Y: $sensorY, Z:$sensorZ")
+        }
+    }
+
+    private fun checkAngle(): Boolean {
+        return sensorX > 8.30 && sensorY > -0.50 && sensorY < 0.50 && sensorZ > -4.50 && sensorZ < 0.5
+    }
 
     companion object {
         private const val TAG = "PreviewFragment"
         private const val REQUEST_CODE_PERMISSIONS = 10
         private val REQUIRED_PERMISSIONS = arrayOf(Manifest.permission.CAMERA)
     }
-
 }
