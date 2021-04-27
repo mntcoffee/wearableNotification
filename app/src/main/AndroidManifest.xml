@@ -3,6 +3,7 @@
     package="com.example.wearablenotification">
 
     <uses-feature android:name="android.hardware.camera.any" />
+
     <uses-permission android:name="android.permission.CAMERA" />
 
     <application
@@ -13,8 +14,9 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.WearableNotification">
         <activity
-            android:name=".setup.SetupActivity"
-            android:screenOrientation="landscape">
+            android:name=".splash.SplashActivity"
+            android:screenOrientation="landscape"
+            android:theme="@style/Theme.AppCompat.Light.NoActionBar">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
@@ -22,10 +24,12 @@
             </intent-filter>
         </activity>
         <activity
-            android:name=".MainActivity"
+            android:name=".setup.SetupActivity"
             android:screenOrientation="landscape">
-
         </activity>
+        <activity
+            android:name=".MainActivity"
+            android:screenOrientation="landscape"></activity>
     </application>
 
 </manifest>
