@@ -12,6 +12,8 @@
         tools:layout="@layout/fragment_first_navigation" >
         <action
             android:id="@+id/action_firstNavigationFragment_to_secondNavigationFragment"
+            app:enterAnim="@animator/slide_from_right"
+            app:exitAnim="@animator/slide_to_left"
             app:destination="@id/secondNavigationFragment" />
     </fragment>
     <fragment
@@ -21,11 +23,15 @@
         tools:layout="@layout/fragment_second_navigation" >
         <action
             android:id="@+id/action_secondNavigationFragment_to_previewFragment"
+            app:enterAnim="@animator/slide_from_right"
+            app:exitAnim="@animator/slide_to_left"
             app:destination="@id/previewFragment" />
     </fragment>
     <fragment
         android:id="@+id/previewFragment"
         android:name="com.example.wearablenotification.setup.PreviewFragment"
+        app:enterAnim="@animator/slide_from_right"
+        app:exitAnim="@animator/slide_to_left"
         android:label="fragment_preview"
         tools:layout="@layout/fragment_preview" />
 </navigation>
