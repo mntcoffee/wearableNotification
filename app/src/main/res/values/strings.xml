@@ -5,4 +5,13 @@
     <string name="next">NEXT</string>
     <string name="back">BACK</string>
     <string name="start">START</string>
+    <string name="navigation_first">
+        本アプリはウェアラブルデバイスと連動して運転者支援を行います．
+        そのため，専用のアプリがインストールされたウェアラブルデバイスとBluetooth接続をしてください.
+        \n\nまず，右画像を参考にスマートフォンを中央部に設置してください．
+    </string>
+
+    <string name="navigation_second">
+        次は取り付け角度の調整を行います．NEXTボタンを押すとカメラプレヴューが出てくるので，右画像を参考に角度を調整してください．
+    </string>
 </resources>
