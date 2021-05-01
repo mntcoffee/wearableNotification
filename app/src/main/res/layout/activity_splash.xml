@@ -4,7 +4,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@color/light_green_700"
+    android:background="@color/white"
     tools:context=".splash.SplashActivity">
 
     <ImageView
@@ -14,16 +14,16 @@
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/imageView3"
         app:srcCompat="@drawable/ic_automobile_splash" />
 
-    <TextView
-        android:id="@+id/textView"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="LOADING..."
-        android:textSize="30sp"
-        app:layout_constraintBottom_toTopOf="@+id/imageView"
+    <ImageView
+        android:id="@+id/imageView3"
+        android:layout_width="437dp"
+        android:layout_height="176dp"
         app:layout_constraintEnd_toEndOf="@+id/imageView"
-        app:layout_constraintStart_toStartOf="@+id/imageView" />
+        app:layout_constraintStart_toStartOf="@+id/imageView"
+        app:srcCompat="@drawable/app_logo"
+        tools:layout_editor_absoluteY="34dp" />
+
 </androidx.constraintlayout.widget.ConstraintLayout>

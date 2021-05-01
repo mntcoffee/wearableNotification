@@ -21,7 +21,7 @@ import androidx.camera.lifecycle.ProcessCameraProvider
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 import androidx.navigation.fragment.findNavController
-import com.example.wearablenotification.MainActivity
+import com.example.wearablenotification.main.MainActivity
 import com.example.wearablenotification.R
 import kotlinx.android.synthetic.main.fragment_preview.*
 import kotlinx.android.synthetic.main.fragment_preview.view.*
@@ -140,9 +140,9 @@ class PreviewFragment : Fragment(), SensorEventListener {
                 startCamera()
             } else {
                 Toast.makeText(activity,
-                    "Permissions not granted by the user.",
+                    "カメラの使用が拒否されたため終了しました",
                     Toast.LENGTH_SHORT).show()
-                activity?.finish()
+                findNavController().popBackStack()
             }
         }
     }
