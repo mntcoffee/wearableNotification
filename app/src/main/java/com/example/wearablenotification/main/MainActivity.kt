@@ -7,17 +7,25 @@ import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.util.Log
 import android.widget.Toast
+import androidx.camera.core.CameraSelector
+import androidx.camera.core.ImageAnalysis
+import androidx.camera.core.ImageProxy
+import androidx.camera.lifecycle.ProcessCameraProvider
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
-import androidx.navigation.fragment.findNavController
 import com.example.wearablenotification.R
-import com.example.wearablenotification.main.Intersection.checkIntersections
+import com.example.wearablenotification.main.intersection.checkIntersections
 import com.google.android.gms.location.*
+import kotlinx.android.synthetic.main.activity_main.*
+import java.util.concurrent.ExecutorService
+import java.util.concurrent.Executors
 
 class MainActivity : AppCompatActivity(), ActivityCompat.OnRequestPermissionsResultCallback {
 
     private lateinit var fusedLocationClient : FusedLocationProviderClient
     private lateinit var locationCallback: LocationCallback
+    private lateinit var cameraExecutor: ExecutorService
+    private var trafficLightIsDetected = false
 
     private var speed = 0.0 // 車の移動速度[km/h]
 
@@ -40,15 +48,65 @@ class MainActivity : AppCompatActivity(), ActivityCompat.OnRequestPermissionsRes
                     // 予測地点に交差点があるなら画像処理を行う
                     if(checkIntersections(location)) {
                         Log.d(TAG, "進行方向に交差点があります")
+                        trafficLightIsDetected = true
                         /**
                          * [TODO] 画像処理を行う
                          */
                     } else {
                         Log.d(TAG, "交差点を探しています...")
+                        trafficLightIsDetected = false
                     }
                 }
             }
         }
+
+        startCamera()
+
+        cameraExecutor = Executors.newSingleThreadExecutor()
+    }
+
+    inner class TrafficLightAnalyzer() : ImageAnalysis.Analyzer {
+        override fun analyze(image: ImageProxy) {
+
+            if(trafficLightIsDetected) {
+                TODO("Not yet implemented")
+            }
+
+
+            runOnUiThread(Runnable() {
+                run() {
+                    TODO("bitmapをresult_image_view_mainに表示")
+                }
+            })
+        }
+
+
+    }
+
+    private fun startCamera() {
+        val cameraProviderFuture = ProcessCameraProvider.getInstance(this)
+
+        cameraProviderFuture.addListener(Runnable {
+            val cameraProvider: ProcessCameraProvider = cameraProviderFuture.get()
+
+            val imageAnalyzer = ImageAnalysis.Builder()
+                    .build()
+                    .also {
+                        it.setAnalyzer(cameraExecutor, TrafficLightAnalyzer())
+                    }
+
+            val cameraSelector = CameraSelector.DEFAULT_BACK_CAMERA
+
+            try {
+                cameraProvider.unbindAll()
+
+                cameraProvider.bindToLifecycle(
+                        this, cameraSelector, imageAnalyzer
+                )
+            } catch (exc: Exception) {
+                Log.e(TAG, "Use case binding failed", exc)
+            }
+        }, ContextCompat.getMainExecutor(this))
     }
 
     override fun onRequestPermissionsResult(
@@ -92,6 +150,11 @@ class MainActivity : AppCompatActivity(), ActivityCompat.OnRequestPermissionsRes
         super.onPause()
         Log.d(TAG, "onPause called")
         stopLocationUpdates()
+    }
+
+    override fun onDestroy() {
+        super.onDestroy()
+        cameraExecutor.shutdown()
     }
 
     @SuppressLint("MissingPermission")

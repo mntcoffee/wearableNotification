@@ -1,4 +1,4 @@
-package com.example.wearablenotification.main.Intersection
+package com.example.wearablenotification.main.intersection
 
 import android.location.Location
 import com.google.android.gms.maps.model.LatLng
