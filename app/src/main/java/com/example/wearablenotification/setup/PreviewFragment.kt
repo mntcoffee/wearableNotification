@@ -34,9 +34,15 @@ class PreviewFragment : Fragment(), SensorEventListener {
     private lateinit var sensorManager: SensorManager
     private lateinit var sensor: Sensor
 
-    private var sensorX: Float = 0.0f
-    private var sensorY: Float = 0.0f
-    private var sensorZ: Float = 0.0f
+    private var sensorX = 0.0f
+    private var sensorY = 0.0f
+    private var sensorZ = 0.0f
+
+    private val sensorXMIN = 8.30f
+    private val sensorYMIN = -0.50f
+    private val sensorYMAX = 0.50f
+    private val sensorZMIN = -4.50f
+    private val sensorZMAX = 0.50f
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -167,7 +173,8 @@ class PreviewFragment : Fragment(), SensorEventListener {
     }
 
     private fun checkAngle(): Boolean {
-        return sensorX > 8.30 && sensorY > -0.50 && sensorY < 0.50 && sensorZ > -4.50 && sensorZ < 0.5
+        return sensorX > sensorXMIN && sensorY > sensorYMIN && sensorY < sensorYMAX &&
+                sensorZ > sensorZMIN && sensorZ < sensorZMAX
     }
 
     companion object {

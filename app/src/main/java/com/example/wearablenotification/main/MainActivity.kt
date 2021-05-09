@@ -60,9 +60,9 @@ class MainActivity : AppCompatActivity(), ActivityCompat.OnRequestPermissionsRes
             }
         }
 
-        startCamera()
+        //startCamera()
 
-        cameraExecutor = Executors.newSingleThreadExecutor()
+        //cameraExecutor = Executors.newSingleThreadExecutor()
     }
 
     inner class TrafficLightAnalyzer() : ImageAnalysis.Analyzer {
@@ -173,7 +173,7 @@ class MainActivity : AppCompatActivity(), ActivityCompat.OnRequestPermissionsRes
     private fun createLocationRequest(): LocationRequest? {
         return LocationRequest.create()?.apply {
             // interval [ms]
-            interval = 3000
+            interval = 100
             // 高精度なリクエスト
             priority = LocationRequest.PRIORITY_HIGH_ACCURACY
         }
