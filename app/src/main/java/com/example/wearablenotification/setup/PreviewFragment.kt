@@ -10,6 +10,7 @@ import android.hardware.SensorEventListener
 import android.hardware.SensorManager
 import android.os.Bundle
 import android.util.Log
+import android.util.Size
 import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
@@ -38,11 +39,19 @@ class PreviewFragment : Fragment(), SensorEventListener {
     private var sensorY = 0.0f
     private var sensorZ = 0.0f
 
+    /*
     private val sensorXMIN = 8.30f
     private val sensorYMIN = -0.50f
     private val sensorYMAX = 0.50f
     private val sensorZMIN = -4.50f
     private val sensorZMAX = 0.50f
+     */
+
+    private val sensorXMIN = 9.0f
+    private val sensorYMIN = -0.50f
+    private val sensorYMAX = 0.50f
+    private val sensorZMIN = -3.50f
+    private val sensorZMAX = 0.1f
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -91,9 +100,28 @@ class PreviewFragment : Fragment(), SensorEventListener {
                     startActivity(intent)
                 }
             } else {
-                Toast.makeText(activity,
-                        "取り付け角度が不適切です．角度を再調整してください",
-                        Toast.LENGTH_SHORT).show()
+                when {
+                    sensorY < sensorYMIN || sensorY > sensorYMAX -> {
+                        Toast.makeText(activity,
+                                "カメラが斜めに傾いています．角度を再調整してください",
+                                Toast.LENGTH_SHORT).show()
+                    }
+                    sensorZ > sensorZMAX -> {
+                        Toast.makeText(activity,
+                                "カメラが下を向いています．角度を再調整してください",
+                                Toast.LENGTH_SHORT).show()
+                    }
+                    sensorZ < sensorZMIN -> {
+                        Toast.makeText(activity,
+                                "カメラが上を向いています．角度を再調整してください",
+                                Toast.LENGTH_SHORT).show()
+                    }
+                    else -> {
+                        Toast.makeText(activity,
+                                "取り付け角度が不適切です．角度を再調整してください",
+                                Toast.LENGTH_SHORT).show()
+                    }
+                }
             }
 
         }
@@ -110,10 +138,11 @@ class PreviewFragment : Fragment(), SensorEventListener {
 
             // Preview
             val preview = Preview.Builder()
-                .build()
-                .also {
-                    it.setSurfaceProvider(preview_view.createSurfaceProvider())
-                }
+                    .setTargetResolution(Size(1920, 1080))
+                    .build()
+                    .also {
+                        it.setSurfaceProvider(preview_view.createSurfaceProvider())
+                    }
 
             // Select back camera as a default
             val cameraSelector = CameraSelector.DEFAULT_BACK_CAMERA

@@ -46,15 +46,12 @@ class MainActivity : AppCompatActivity(), ActivityCompat.OnRequestPermissionsRes
                     speed = location.speed * 3.6
                     Log.d(TAG, "speed: %.3f".format(speed))
                     // 予測地点に交差点があるなら画像処理を行う
-                    if(checkIntersections(location)) {
+                    trafficLightIsDetected = if(checkIntersections(location)) {
                         Log.d(TAG, "進行方向に交差点があります")
-                        trafficLightIsDetected = true
-                        /**
-                         * [TODO] 画像処理を行う
-                         */
+                        true
                     } else {
                         Log.d(TAG, "交差点を探しています...")
-                        trafficLightIsDetected = false
+                        false
                     }
                 }
             }
