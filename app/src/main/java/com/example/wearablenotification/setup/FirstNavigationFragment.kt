@@ -3,6 +3,7 @@ package com.example.wearablenotification.setup
 import android.content.Context
 import android.media.AudioManager
 import android.os.Bundle
+import android.text.method.ScrollingMovementMethod
 import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
@@ -23,11 +24,15 @@ class FirstNavigationFragment : Fragment() {
     ): View? {
 
         audioManager = activity?.getSystemService(Context.AUDIO_SERVICE) as AudioManager
-        var ringerMode = audioManager.ringerMode
+
         // Inflate the layout for this fragment
         val view = inflater.inflate(R.layout.fragment_first_navigation, container, false)
 
+        // enable scroll text view
+        view.text_view_navigation_first.movementMethod = ScrollingMovementMethod()
+
         view.next_button_first_fragment.setOnClickListener {
+            var ringerMode = audioManager.ringerMode
             when(ringerMode) {
                 AudioManager.RINGER_MODE_VIBRATE -> {
                     // manner
