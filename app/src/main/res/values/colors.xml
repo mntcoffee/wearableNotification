@@ -11,4 +11,7 @@
     <color name="light_green_dark">#00600f</color>
     <color name="light_green_light">#aee571</color>
     <color name="cyan_800">#00838f</color>
+    <color name="orange">#f48600</color>
+    <color name="orange_light">#ffb743</color>
+    <color name="orange_dark">#bb5800</color>
 </resources>

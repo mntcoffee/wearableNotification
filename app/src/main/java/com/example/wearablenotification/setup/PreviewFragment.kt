@@ -87,10 +87,11 @@ class PreviewFragment : Fragment(), SensorEventListener {
         // Inflate the layout for this fragment
         val view = inflater.inflate(R.layout.fragment_preview, container, false)
 
+        /*
         view.back_button_preview_fragment.setOnClickListener {
             findNavController().popBackStack()
         }
-
+         */
         view.start_button_preview_fragment.setOnClickListener {
 
             if(checkAngle()) {

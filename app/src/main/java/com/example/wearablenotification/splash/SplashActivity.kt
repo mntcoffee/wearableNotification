@@ -16,7 +16,7 @@ class SplashActivity : AppCompatActivity() {
         setContentView(R.layout.activity_splash)
 
         CoroutineScope(Dispatchers.Main).launch {
-            delay(7000)
+            delay(6200)
             val intent = Intent(this@SplashActivity, SetupActivity::class.java)
             startActivity(intent)
             finish()

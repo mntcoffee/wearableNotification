@@ -19,9 +19,12 @@ class SecondNavigationFragment : Fragment() {
         // Inflate the layout for this fragment
         val view =  inflater.inflate(R.layout.fragment_second_navigation, container, false)
 
+        /*
         view.back_button_second_fragment.setOnClickListener {
             findNavController().popBackStack()
         }
+
+         */
 
         view.next_button_second_fragment.setOnClickListener {
             findNavController().navigate(R.id.action_secondNavigationFragment_to_previewFragment)

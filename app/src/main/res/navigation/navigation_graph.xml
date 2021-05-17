@@ -8,7 +8,7 @@
     <fragment
         android:id="@+id/firstNavigationFragment"
         android:name="com.example.wearablenotification.setup.FirstNavigationFragment"
-        android:label="fragment_first_navigation"
+        android:label="@string/setup1"
         tools:layout="@layout/fragment_first_navigation" >
         <action
             android:id="@+id/action_firstNavigationFragment_to_secondNavigationFragment"
@@ -19,7 +19,7 @@
     <fragment
         android:id="@+id/secondNavigationFragment"
         android:name="com.example.wearablenotification.setup.SecondNavigationFragment"
-        android:label="fragment_second_navigation"
+        android:label="@string/setup2"
         tools:layout="@layout/fragment_second_navigation" >
         <action
             android:id="@+id/action_secondNavigationFragment_to_previewFragment"
@@ -32,6 +32,6 @@
         android:name="com.example.wearablenotification.setup.PreviewFragment"
         app:enterAnim="@animator/slide_from_right"
         app:exitAnim="@animator/slide_to_left"
-        android:label="fragment_preview"
+        android:label="@string/setup2"
         tools:layout="@layout/fragment_preview" />
 </navigation>

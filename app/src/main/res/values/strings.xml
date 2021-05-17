@@ -15,4 +15,7 @@
     <string name="navigation_second">
         次は取り付け角度の調整を行います．NEXTボタンを押すとカメラプレヴューが出てくるので，右画像を参考に角度を調整してください．
     </string>
+
+    <string name="setup1">Setup1 - 取り付け位置等の確認</string>
+    <string name="setup2">Setup2 - 取り付け角度の調整</string>
 </resources>

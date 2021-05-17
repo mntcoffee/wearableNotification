@@ -5,6 +5,7 @@
     android:id="@+id/frameLayout"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:background="#353333"
     tools:context=".setup.FirstNavigationFragment">
 
     <com.google.android.material.button.MaterialButton
@@ -28,8 +29,10 @@
         android:layout_marginStart="32dp"
         android:layout_marginTop="8dp"
         android:layout_marginBottom="8dp"
-        android:singleLine="false"
         android:scrollbars="vertical"
+        android:singleLine="false"
+        android:textColor="@color/white"
+        android:textSize="15sp"
         android:text="@string/navigation_first"
         app:layout_constraintBottom_toTopOf="@+id/next_button_first_fragment"
         app:layout_constraintStart_toStartOf="parent"
