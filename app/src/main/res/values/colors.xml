@@ -14,4 +14,5 @@
     <color name="orange">#f48600</color>
     <color name="orange_light">#ffb743</color>
     <color name="orange_dark">#bb5800</color>
+    <color name="logo_color">#3F3F3F</color>
 </resources>

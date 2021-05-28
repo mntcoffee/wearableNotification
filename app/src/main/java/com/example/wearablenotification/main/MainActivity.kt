@@ -2,6 +2,7 @@ package com.example.wearablenotification.main
 
 import android.Manifest
 import android.annotation.SuppressLint
+import android.content.Intent
 import android.content.pm.ActivityInfo
 import android.content.pm.PackageManager
 import androidx.appcompat.app.AppCompatActivity
@@ -17,6 +18,7 @@ import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 import com.example.wearablenotification.R
 import com.example.wearablenotification.main.intersection.checkIntersections
+import com.example.wearablenotification.setup.SetupActivity
 import com.google.android.gms.location.*
 import kotlinx.android.synthetic.main.activity_main.*
 import java.util.concurrent.ExecutorService
@@ -122,9 +124,11 @@ class MainActivity : AppCompatActivity(), ActivityCompat.OnRequestPermissionsRes
             }
         } else {
             Toast.makeText(this,
-                    "位置情報の使用が拒否されたため終了しました",
+                    "位置情報の使用が拒否されたため再起動しました",
                     Toast.LENGTH_LONG).show()
-            finish()
+            val intent = Intent(this, SetupActivity::class.java)
+
+            startActivity(intent)
         }
     }
 

@@ -101,28 +101,9 @@ class PreviewFragment : Fragment(), SensorEventListener {
                     startActivity(intent)
                 }
             } else {
-                when {
-                    sensorY < sensorYMIN || sensorY > sensorYMAX -> {
-                        Toast.makeText(activity,
-                                "カメラが斜めに傾いています．角度を再調整してください",
-                                Toast.LENGTH_SHORT).show()
-                    }
-                    sensorZ > sensorZMAX -> {
-                        Toast.makeText(activity,
-                                "カメラが下を向いています．角度を再調整してください",
-                                Toast.LENGTH_SHORT).show()
-                    }
-                    sensorZ < sensorZMIN -> {
-                        Toast.makeText(activity,
-                                "カメラが上を向いています．角度を再調整してください",
-                                Toast.LENGTH_SHORT).show()
-                    }
-                    else -> {
-                        Toast.makeText(activity,
-                                "取り付け角度が不適切です．角度を再調整してください",
-                                Toast.LENGTH_SHORT).show()
-                    }
-                }
+                Toast.makeText(activity,
+                    "取り付け角度が不適切です．角度を再調整してください",
+                    Toast.LENGTH_SHORT).show()
             }
 
         }
@@ -197,6 +178,25 @@ class PreviewFragment : Fragment(), SensorEventListener {
             sensorX = event.values[0]
             sensorY = event.values[1]
             sensorZ = event.values[2]
+
+            if(checkAngle()) {
+                check_angle_text_view_preview.text = "適切な角度です．STARTボタンを押してください"
+            } else {
+                when {
+                    sensorY < sensorYMIN || sensorY > sensorYMAX -> {
+                        check_angle_text_view_preview.text = "カメラが傾いています"
+                    }
+                    sensorZ > sensorZMAX -> {
+                        check_angle_text_view_preview.text = "カメラが下を向いています"
+                    }
+                    sensorZ < sensorZMIN -> {
+                        check_angle_text_view_preview.text = "カメラが上を向いています"
+                    }
+                    else -> {
+                        check_angle_text_view_preview.text = "カメラの角度が不適切です"
+                    }
+                }
+            }
 
             Log.d(TAG, "X: $sensorX, Y: $sensorY, Z:$sensorZ")
         }
