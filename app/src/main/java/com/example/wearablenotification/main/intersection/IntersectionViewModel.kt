@@ -7,8 +7,9 @@ import kotlin.math.PI
 import kotlin.math.cos
 import kotlin.math.sin
 
-const val DISTANCE = 0.000700   // 予測地点までの距離(緯度軽度ベース)
-const val NUMBER_OF_INTERSECTIONS = 1
+const val DISTANCE_LONGITUDE = 0.00054832 // 予測地点までの距離(50mの経度)
+const val DISTANCE_LATITUDE = 0.00045066   // 予測地点までの距離(50mの緯度)
+private val NUMBER_OF_INTERSECTIONS = intersection.count()
 
 fun checkIntersections(location: Location): Boolean {
     val predictedLocation = calculatePredictedLocation(location)
@@ -25,8 +26,8 @@ fun checkIntersections(location: Location): Boolean {
 
 private fun calculatePredictedLocation(location: Location): LatLng {
     val degree = location.bearing * 2 * PI / 360
-    val predictedLatitude = location.latitude + DISTANCE * cos(degree)
-    val predictedLongitude = location.longitude + DISTANCE * sin(degree)
+    val predictedLatitude = location.latitude + DISTANCE_LATITUDE * cos(degree)
+    val predictedLongitude = location.longitude + DISTANCE_LONGITUDE * sin(degree)
 
     return LatLng(predictedLatitude, predictedLongitude)
 }

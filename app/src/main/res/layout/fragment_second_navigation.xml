@@ -35,15 +35,16 @@
 
     <TextView
         android:id="@+id/text_view_navigation_first"
-        android:layout_width="200dp"
+        android:layout_width="300dp"
         android:layout_height="0dp"
         android:layout_marginStart="32dp"
-        android:layout_marginTop="8dp"
+        android:layout_marginTop="32dp"
         android:layout_marginBottom="8dp"
         android:singleLine="false"
-        android:textColor="@color/white"
-        android:textSize="15sp"
         android:text="@string/navigation_second"
+        android:textColor="@color/white"
+        android:textSize="16sp"
+        app:layout_constraintBottom_toTopOf="@+id/next_button_second_fragment"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 
@@ -51,8 +52,7 @@
         android:id="@+id/imageView2"
         android:layout_width="0dp"
         android:layout_height="0dp"
-        android:layout_marginStart="8dp"
-        android:layout_marginTop="8dp"
+        android:layout_marginTop="32dp"
         android:layout_marginEnd="8dp"
         android:layout_marginBottom="8dp"
         android:src="@drawable/navigation2"
