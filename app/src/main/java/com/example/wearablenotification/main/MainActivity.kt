@@ -34,17 +34,19 @@ class MainActivity : AppCompatActivity(), ActivityCompat.OnRequestPermissionsRes
     private lateinit var locationCallback: LocationCallback
     private lateinit var cameraExecutor: ExecutorService
     private var trafficLightIsDetected = false
+    private var speed = 0.0
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
         window.addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON) // sleep locked
 
+        val notificator = Notificator()
         // soundPool の初期化
-        initSoundPool(this)
+        notificator.initSoundPool(this)
 
         // vibrato　の初期化
-        buildVibrator(this)
+        notificator.buildVibrator(this)
 
         // 位置情報の取得
         fusedLocationClient = LocationServices.getFusedLocationProviderClient(this)
@@ -214,17 +216,5 @@ class MainActivity : AppCompatActivity(), ActivityCompat.OnRequestPermissionsRes
         const val TAG = "Main"
         private const val LOCATION_PERMISSION_REQUEST_CODE = 1
         private val REQUIRED_PERMISSIONS = arrayOf(Manifest.permission.ACCESS_FINE_LOCATION)
-        const val NOTIFICATION_ID = 10
-        const val CHANNEL_ID_1 = "channel_01"
-        const val CHANNEL_ID_2 = "channel_02"
-
-        // notification
-        lateinit var soundPool: SoundPool
-        lateinit var audioAttributes: AudioAttributes
-        var alert1 = 0
-        lateinit var notificationBuilderPattern1: NotificationCompat.Builder
-        lateinit var notificationBuilderPattern2: NotificationCompat.Builder
-
-        var speed = 0.0 // 車の移動速度[km/h]
     }
 }
