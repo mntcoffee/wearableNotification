@@ -3,31 +3,30 @@ package com.example.wearablenotification.main
 import android.Manifest
 import android.annotation.SuppressLint
 import android.content.Intent
-import android.content.pm.ActivityInfo
 import android.content.pm.PackageManager
+import android.graphics.*
 import android.media.AudioAttributes
 import android.media.SoundPool
-import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.util.Log
 import android.view.WindowManager
 import android.widget.Toast
+import androidx.appcompat.app.AppCompatActivity
 import androidx.camera.core.CameraSelector
 import androidx.camera.core.ImageAnalysis
 import androidx.camera.core.ImageProxy
+import androidx.camera.core.Preview
 import androidx.camera.lifecycle.ProcessCameraProvider
 import androidx.core.app.ActivityCompat
 import androidx.core.app.NotificationCompat
-import androidx.core.app.NotificationManagerCompat
 import androidx.core.content.ContextCompat
 import com.example.wearablenotification.R
 import com.example.wearablenotification.main.intersection.checkIntersections
 import com.example.wearablenotification.setup.SetupActivity
 import com.google.android.gms.location.*
 import kotlinx.android.synthetic.main.activity_main.*
-import java.security.spec.MGF1ParameterSpec
 import java.util.concurrent.ExecutorService
-import java.util.concurrent.Executors
+
 
 class MainActivity : AppCompatActivity(), ActivityCompat.OnRequestPermissionsResultCallback {
 
@@ -36,25 +35,16 @@ class MainActivity : AppCompatActivity(), ActivityCompat.OnRequestPermissionsRes
     private lateinit var cameraExecutor: ExecutorService
     private var trafficLightIsDetected = false
 
-    // notification
-    private lateinit var soundPool: SoundPool
-    private lateinit var audioAttributes: AudioAttributes
-    private var alert1 = 0
-    private lateinit var notificationBuilderPattern1: NotificationCompat.Builder
-    private lateinit var notificationBuilderPattern2: NotificationCompat.Builder
-
-    private var speed = 0.0 // 車の移動速度[km/h]
-
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
         window.addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON) // sleep locked
 
         // soundPool の初期化
-        initSoundPool()
+        initSoundPool(this)
 
-        // buildVibration
-        buildVibrator()
+        // vibrato　の初期化
+        buildVibrator(this)
 
         // 位置情報の取得
         fusedLocationClient = LocationServices.getFusedLocationProviderClient(this)
@@ -87,10 +77,13 @@ class MainActivity : AppCompatActivity(), ActivityCompat.OnRequestPermissionsRes
         //cameraExecutor = Executors.newSingleThreadExecutor()
     }
 
+    /*
     inner class TrafficLightAnalyzer() : ImageAnalysis.Analyzer {
         override fun analyze(image: ImageProxy) {
 
-            if(trafficLightIsDetected) {
+            // convert ImageProxy to bitmap
+
+            if(trafficLightIsDetected && speed > 10.0) {
                 TODO("Not yet implemented. detect traffic light by tfFlow-light")
             } else {
                 TODO("Not yet implemented. not in the traffic intersection, so not analyze")
@@ -99,10 +92,10 @@ class MainActivity : AppCompatActivity(), ActivityCompat.OnRequestPermissionsRes
             runOnUiThread(Runnable() {
                 run() {
                     TODO("bitmapをresult_image_view_mainに表示")
+                    // result_image_view_main.setImageBitmap(image)
                 }
             })
         }
-
 
     }
 
@@ -111,6 +104,12 @@ class MainActivity : AppCompatActivity(), ActivityCompat.OnRequestPermissionsRes
 
         cameraProviderFuture.addListener(Runnable {
             val cameraProvider: ProcessCameraProvider = cameraProviderFuture.get()
+
+            val preview = Preview.Builder()
+                .build()
+                .also {
+                    it.setSurfaceProvider()
+                }
 
             val imageAnalyzer = ImageAnalysis.Builder()
                     .build()
@@ -124,73 +123,15 @@ class MainActivity : AppCompatActivity(), ActivityCompat.OnRequestPermissionsRes
                 cameraProvider.unbindAll()
 
                 cameraProvider.bindToLifecycle(
-                        this, cameraSelector, imageAnalyzer
-                )
+                        this, cameraSelector, preview, imageAnalyzer)
             } catch (exc: Exception) {
                 Log.e(TAG, "Use case binding failed", exc)
             }
         }, ContextCompat.getMainExecutor(this))
     }
 
-    /*------------- Notification -------------*/
+     */
 
-    private fun initSoundPool() {
-        audioAttributes = AudioAttributes.Builder()
-            .setUsage(AudioAttributes.USAGE_NOTIFICATION)
-            .setContentType(AudioAttributes.CONTENT_TYPE_SPEECH)
-            .build()
-
-        soundPool = SoundPool.Builder()
-            .setAudioAttributes(audioAttributes)
-            .setMaxStreams(1)
-            .build()
-
-        alert1 = soundPool.load(this, R.raw.alert1, 1)
-
-        soundPool.setOnLoadCompleteListener{ _: SoundPool, sampleId: Int, status: Int ->
-            Log.d(TAG, "sampleId = $sampleId")
-            Log.d(TAG, "status = $status")
-        }
-    }
-
-    private fun buildVibrator() {
-        notificationBuilderPattern1 = NotificationCompat.Builder(this, CHANNEL_ID_1)
-            .setSmallIcon(R.drawable.ic_launcher_foreground)
-            .setContentTitle("パターン1")
-            .setContentText("通知テスト")
-            .setPriority(NotificationCompat.PRIORITY_MAX)   /// 通知の優先度(緊急)
-            .setVibrate(longArrayOf(0, 200, 25, 200, 25, 1000))
-
-        notificationBuilderPattern2 = NotificationCompat.Builder(this, CHANNEL_ID_2)
-            .setSmallIcon(R.drawable.ic_launcher_foreground)
-            .setContentTitle("パターン2")
-            .setContentText("通知テスト")
-            .setPriority(NotificationCompat.PRIORITY_HIGH)   // 通知の優先度(高)
-            .setVibrate(longArrayOf(0, 100, 100, 100, 100, 100))  // 通知の振動設定
-    }
-
-    private fun alert01() {
-        soundPool.play(alert1, 1.0f, 1.0f, 5, 2, 1.0f)
-
-        // 通知の表示
-        with(NotificationManagerCompat.from(this)) {
-            // notificationId is a unique int for each notification that you must define
-            notify(NOTIFICATION_ID, notificationBuilderPattern1.build())
-        }
-
-        Log.d(TAG, "pattern1: 50km/h over")
-    }
-
-    private fun alert02() {
-        // 通知の表示
-        with(NotificationManagerCompat.from(this)) {
-            // notificationId is a unique int for each notification that you must define
-            notify(NOTIFICATION_ID, notificationBuilderPattern2.build())
-        }
-
-        Log.d(TAG, "pattern2: from 10km/h to 50km/h")
-
-    }
 
     /*------------- permission -------------*/
 
@@ -270,11 +211,20 @@ class MainActivity : AppCompatActivity(), ActivityCompat.OnRequestPermissionsRes
 
 
     companion object {
-        private const val TAG = "Main"
+        const val TAG = "Main"
         private const val LOCATION_PERMISSION_REQUEST_CODE = 1
         private val REQUIRED_PERMISSIONS = arrayOf(Manifest.permission.ACCESS_FINE_LOCATION)
-        private const val NOTIFICATION_ID = 10
-        private const val CHANNEL_ID_1 = "channel_01"
-        private const val CHANNEL_ID_2 = "channel_02"
+        const val NOTIFICATION_ID = 10
+        const val CHANNEL_ID_1 = "channel_01"
+        const val CHANNEL_ID_2 = "channel_02"
+
+        // notification
+        lateinit var soundPool: SoundPool
+        lateinit var audioAttributes: AudioAttributes
+        var alert1 = 0
+        lateinit var notificationBuilderPattern1: NotificationCompat.Builder
+        lateinit var notificationBuilderPattern2: NotificationCompat.Builder
+
+        var speed = 0.0 // 車の移動速度[km/h]
     }
 }
