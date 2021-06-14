@@ -7,18 +7,12 @@ import android.util.Log
 import androidx.core.app.NotificationCompat
 import androidx.core.app.NotificationManagerCompat
 import com.example.wearablenotification.R
-import com.example.wearablenotification.main.MainActivity.Companion.alert1
-import com.example.wearablenotification.main.MainActivity.Companion.audioAttributes
-import com.example.wearablenotification.main.MainActivity.Companion.notificationBuilderPattern1
-import com.example.wearablenotification.main.MainActivity.Companion.notificationBuilderPattern2
-import com.example.wearablenotification.main.MainActivity.Companion.soundPool
-import com.example.wearablenotification.main.MainActivity.Companion.speed
 
 class Notificator {
-    lateinit var audioAttributes: AudioAttributes
-    var alert1 = 0
-    lateinit var notificationBuilderPattern1: NotificationCompat.Builder
-    lateinit var notificationBuilderPattern2: NotificationCompat.Builder
+    private lateinit var audioAttributes: AudioAttributes
+    private var alert1 = 0
+    private lateinit var notificationBuilderPattern1: NotificationCompat.Builder
+    private lateinit var notificationBuilderPattern2: NotificationCompat.Builder
     lateinit var soundPool: SoundPool
 
     fun initSoundPool(context: Context) {
