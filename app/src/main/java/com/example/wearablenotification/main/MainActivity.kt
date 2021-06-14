@@ -2,6 +2,8 @@ package com.example.wearablenotification.main
 
 import android.Manifest
 import android.annotation.SuppressLint
+import android.app.NotificationManager
+import android.content.Context
 import android.content.Intent
 import android.content.pm.PackageManager
 import android.content.res.AssetFileDescriptor
@@ -16,6 +18,8 @@ import androidx.camera.core.ImageAnalysis
 import androidx.camera.core.Preview
 import androidx.camera.lifecycle.ProcessCameraProvider
 import androidx.core.app.ActivityCompat
+import androidx.core.app.NotificationCompat
+import androidx.core.app.NotificationManagerCompat
 import androidx.core.content.ContextCompat
 import com.example.android.camera.utils.com.example.trafficlightdetection.Analyze
 import com.example.android.camera.utils.com.example.trafficlightdetection.YuvToRgbConverter
@@ -58,7 +62,9 @@ class MainActivity : AppCompatActivity(), ActivityCompat.OnRequestPermissionsRes
         // soundPool の初期化
         with(notificator) {
             this.initSoundPool()
-            this.buildVibrator()
+            this.buildVibrator(
+                getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
+            )
         }
 
         // 位置情報の取得

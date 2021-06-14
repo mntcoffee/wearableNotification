@@ -1,11 +1,15 @@
 package com.example.wearablenotification.main
 
+import android.app.NotificationChannel
+import android.app.NotificationManager
 import android.content.Context
 import android.media.AudioAttributes
 import android.media.SoundPool
+import android.os.Build
 import android.util.Log
 import androidx.core.app.NotificationCompat
 import androidx.core.app.NotificationManagerCompat
+import androidx.core.content.ContextCompat.getSystemService
 import com.example.wearablenotification.R
 import com.example.wearablenotification.main.MainActivity.Companion.SPEED_01
 import com.example.wearablenotification.main.MainActivity.Companion.SPEED_02
@@ -18,6 +22,8 @@ class Notificator(
     private var alert1 = 0
     private lateinit var notificationBuilderPattern1: NotificationCompat.Builder
     private lateinit var notificationBuilderPattern2: NotificationCompat.Builder
+    private lateinit var channel1: NotificationChannel
+    private lateinit var channel2: NotificationChannel
     private lateinit var soundPool: SoundPool
 
     fun initSoundPool() {
@@ -39,7 +45,8 @@ class Notificator(
         }
     }
 
-    fun buildVibrator() {
+    fun buildVibrator(manager: NotificationManager) {
+
         notificationBuilderPattern1 = NotificationCompat.Builder(context, CHANNEL_ID_1)
             .setSmallIcon(R.drawable.ic_launcher_foreground)
             .setContentTitle("パターン1")
@@ -53,6 +60,33 @@ class Notificator(
             .setContentText("通知テスト")
             .setPriority(NotificationCompat.PRIORITY_HIGH)   // 通知の優先度(高)
             .setVibrate(longArrayOf(0, 100, 100, 100, 100, 100))  // 通知の振動設定
+
+        // Android8（API26）以上の場合、チャネルに登録する
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O){
+
+            channel1 = NotificationChannel(
+                CHANNEL_ID_1,
+                "パターン1",
+                NotificationManager.IMPORTANCE_HIGH
+            ).apply {
+                this.description = "通知テスト"
+                this.vibrationPattern = longArrayOf(0, 200, 25, 200, 25, 1000)
+            }
+
+            channel2 = NotificationChannel(
+                CHANNEL_ID_2,
+                "パターン2",
+                NotificationManager.IMPORTANCE_HIGH
+            ).apply {
+                this.description = "通知テスト"
+                this.vibrationPattern = longArrayOf(0, 200, 25, 200, 25, 1000)
+            }
+
+            // システムにチャネルを登録する
+            manager.createNotificationChannel(channel1)
+            manager.createNotificationChannel(channel2)
+
+        }
     }
 
     fun alertDriver() {
