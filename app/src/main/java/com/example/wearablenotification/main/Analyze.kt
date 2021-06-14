@@ -1,6 +1,7 @@
 package com.example.android.camera.utils.com.example.trafficlightdetection
 
 import android.annotation.SuppressLint
+import android.content.Context
 import android.graphics.Bitmap
 import android.graphics.Rect
 import android.graphics.RectF
@@ -9,13 +10,15 @@ import android.util.Log
 import android.util.Size
 import androidx.camera.core.ImageAnalysis
 import androidx.camera.core.ImageProxy
-import com.example.wearablenotification.main.ObjectDetector
-import com.example.wearablenotification.main.OverlaySurfaceView
-import com.example.wearablenotification.main.RoiCalculator
+import com.example.wearablenotification.main.*
+import com.example.wearablenotification.main.MainActivity.Companion.SPEED_02
+import com.example.wearablenotification.main.MainActivity.Companion.speed
+import com.example.wearablenotification.main.MainActivity.Companion.trafficLightIsDetected
 import org.tensorflow.lite.Interpreter
 
 /**
  * Analyze内の画像解析ユースケース
+ * @param notificator Notificatorのインスタンス
  * @param yuvToRgbConverter カメラ画像のImageバッファYUV_420_888からRGB形式に変換する
  * @param interpreter tfliteモデルを操作するライブラリ
  * @param labels 正解ラベルのリスト
@@ -24,6 +27,7 @@ import org.tensorflow.lite.Interpreter
  */
 
 class Analyze(
+    private val notificator: Notificator,
     private val yuvToRgbConverter: YuvToRgbConverter,
     private val interpreter: Interpreter,
     private val labels: List<String>,
@@ -37,50 +41,59 @@ class Analyze(
     override fun analyze(imageProxy: ImageProxy) {
         if (imageProxy.image == null) return
 
-        // TODO : 交差点接近
+        //交差点判定と車速によって分岐
+        if(/*trafficLightIsDetected && */speed > SPEED_02) {
 
-        // TODO : 車速の取得
+            //取得画像の回転向き、大きさを取得
+            imageRotationDegrees = imageProxy.imageInfo.rotationDegrees
+            val imageProxySize = Size(imageProxy.width, imageProxy.height)
 
-        //取得画像の回転向き、大きさを取得
-        imageRotationDegrees = imageProxy.imageInfo.rotationDegrees
-        val imageProxySize = Size(imageProxy.width, imageProxy.height)
+            // 物体検知器の作成
+            val objectDetector = ObjectDetector(interpreter, labels, imageRotationDegrees)
 
-        // 物体検知器の作成
-        val objectDetector = ObjectDetector(interpreter, labels, imageRotationDegrees)
+            // TODO : ROI自動化
+            val roi = RoiCalculator().calcRoi(imageProxySize)
 
-        // TODO : ROI自動化
-        val roi = RoiCalculator().calcRoi(imageProxySize)
+            // 解析対象の画像を取得 (YUV -> RGB bitmap -> ROIで切り取る)
+            // bitmap : カメラ原画像
+            // roiBitmap : ROI画像
+            val bitmap = yuvToRgbBitmap(imageProxy.image!!)
+            val roiBitmap = cropBitmap(roi, bitmap)
 
-        // 解析対象の画像を取得 (YUV -> RGB bitmap -> ROIで切り取る)
-        // bitmap : カメラ原画像
-        // roiBitmap : ROI画像
-        val bitmap = yuvToRgbBitmap(imageProxy.image!!)
-        val roiBitmap = cropBitmap(roi, bitmap)
+            imageProxy.close() // imageProxyの解放 : 必ず呼ぶ
 
-        imageProxy.close() // imageProxyの解放 : 必ず呼ぶ
+            // 信号機検知処理(推論処理)
+            // detectedObjectList : roiBitmap座標
+            // 確率の高い順に格納されている
+            val detectedObjectList = objectDetector.detect(roiBitmap)
 
-        // 信号機検知処理(推論処理)
-        // detectedObjectList : roiBitmap座標
-        // 確率の高い順に格納されている
-        val detectedObjectList = objectDetector.detect(roiBitmap)
+            // 赤信号フラグ
+            var redIsLighting = false
 
-        // 赤信号フラグ
-        var redIsLighting = false
+            // 信号機色判定処理(検知された場合のみ実行)
+            if (detectedObjectList.isNotEmpty()) {
+                // 最も確率の高い部分のみ抜き出す
+                val trafficLightBitmap = cropBitmap(detectedObjectList[0].boundingBox, roiBitmap)
+                redIsLighting = objectDetector.analyzeTrafficColor(trafficLightBitmap)
+            }
 
-        // 信号機色判定処理(検知された場合のみ実行)
-        if(detectedObjectList.isNotEmpty()) {
-            // 最も確率の高い部分のみ抜き出す
-            val trafficLightBitmap = cropBitmap(detectedObjectList[0].boundingBox, roiBitmap)
-            redIsLighting = objectDetector.analyzeTrafficColor(trafficLightBitmap)
+            // 警告通知処理
+            if(redIsLighting){
+                notificator.alertDriver()
+            }
+
+            // 検出結果の表示(OverlaySurfaceView.kt参照)
+            overlaySurfaceView.draw(
+                roi,
+                detectedObjectList,
+                redIsLighting,
+                imageProxySize,
+                resultViewSize
+            )
+
+        }else{
+            imageProxy.close() // imageProxyの解放 : 必ず呼ぶ
         }
-
-        // TODO : 警告通知処理 (speedで分岐)
-
-        // 検出結果の表示(OverlaySurfaceView.kt参照)
-        overlaySurfaceView.draw(roi, detectedObjectList, redIsLighting, imageProxySize, resultViewSize)
-
-        // TODO : interpreterのリソースの解放(Analyze外)
-        // interpreter.close()
     }
 
 

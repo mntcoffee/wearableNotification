@@ -5,9 +5,6 @@ import android.annotation.SuppressLint
 import android.content.Intent
 import android.content.pm.PackageManager
 import android.content.res.AssetFileDescriptor
-import android.graphics.*
-import android.media.AudioAttributes
-import android.media.SoundPool
 import android.os.Bundle
 import android.util.Log
 import android.util.Size
@@ -16,11 +13,9 @@ import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.camera.core.CameraSelector
 import androidx.camera.core.ImageAnalysis
-import androidx.camera.core.ImageProxy
 import androidx.camera.core.Preview
 import androidx.camera.lifecycle.ProcessCameraProvider
 import androidx.core.app.ActivityCompat
-import androidx.core.app.NotificationCompat
 import androidx.core.content.ContextCompat
 import com.example.android.camera.utils.com.example.trafficlightdetection.Analyze
 import com.example.android.camera.utils.com.example.trafficlightdetection.YuvToRgbConverter
@@ -47,8 +42,7 @@ class MainActivity : AppCompatActivity(), ActivityCompat.OnRequestPermissionsRes
     private lateinit var fusedLocationClient : FusedLocationProviderClient
     private lateinit var locationCallback: LocationCallback
     private lateinit var cameraExecutor: ExecutorService
-    private var trafficLightIsDetected = false
-    private var speed = 0.0
+    private lateinit var notificator: Notificator
 
     // Surface Viewのコールバックをセット
     private lateinit var overlaySurfaceView: OverlaySurfaceView
@@ -60,12 +54,12 @@ class MainActivity : AppCompatActivity(), ActivityCompat.OnRequestPermissionsRes
         setContentView(R.layout.activity_main)
         window.addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON) // sleep locked
 
-        val notificator = Notificator()
+        notificator = Notificator(this)
         // soundPool の初期化
-        notificator.initSoundPool(this)
-
-        // vibrato　の初期化
-        notificator.buildVibrator(this)
+        with(notificator) {
+            this.initSoundPool()
+            this.buildVibrator()
+        }
 
         // 位置情報の取得
         fusedLocationClient = LocationServices.getFusedLocationProviderClient(this)
@@ -133,6 +127,7 @@ class MainActivity : AppCompatActivity(), ActivityCompat.OnRequestPermissionsRes
 
                         // 画像解析(Analyze.kt参照)
                         Analyze(
+                            notificator,
                             yuvToRgbConverter,
                             interpreter,
                             labels,
@@ -209,6 +204,7 @@ class MainActivity : AppCompatActivity(), ActivityCompat.OnRequestPermissionsRes
     override fun onDestroy() {
         super.onDestroy()
         cameraExecutor.shutdown()
+        interpreter.close()
     }
 
     @SuppressLint("MissingPermission")
@@ -289,6 +285,12 @@ class MainActivity : AppCompatActivity(), ActivityCompat.OnRequestPermissionsRes
         const val TAG = "Main"
         private const val LOCATION_PERMISSION_REQUEST_CODE = 1
         private val REQUIRED_PERMISSIONS = arrayOf(Manifest.permission.ACCESS_FINE_LOCATION)
+
+        var trafficLightIsDetected = false
+        var speed = 0.0
+
+        const val SPEED_01 = 20.0
+        const val SPEED_02 = 0.0
 
         // モデル名とラベル名
         private const val MODEL_FILE_NAME = "ssd_mobilenet_v1.tflite"
