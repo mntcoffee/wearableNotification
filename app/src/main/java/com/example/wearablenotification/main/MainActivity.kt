@@ -4,11 +4,13 @@ import android.Manifest
 import android.annotation.SuppressLint
 import android.content.Intent
 import android.content.pm.PackageManager
+import android.content.res.AssetFileDescriptor
 import android.graphics.*
 import android.media.AudioAttributes
 import android.media.SoundPool
 import android.os.Bundle
 import android.util.Log
+import android.util.Size
 import android.view.WindowManager
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
@@ -20,12 +22,24 @@ import androidx.camera.lifecycle.ProcessCameraProvider
 import androidx.core.app.ActivityCompat
 import androidx.core.app.NotificationCompat
 import androidx.core.content.ContextCompat
+import com.example.android.camera.utils.com.example.trafficlightdetection.Analyze
+import com.example.android.camera.utils.com.example.trafficlightdetection.YuvToRgbConverter
 import com.example.wearablenotification.R
 import com.example.wearablenotification.main.intersection.checkIntersections
 import com.example.wearablenotification.setup.SetupActivity
 import com.google.android.gms.location.*
+import com.google.common.util.concurrent.ListenableFuture
 import kotlinx.android.synthetic.main.activity_main.*
+import org.opencv.android.OpenCVLoader
+import org.tensorflow.lite.Interpreter
+import java.io.BufferedReader
+import java.io.FileInputStream
+import java.io.InputStream
+import java.io.InputStreamReader
+import java.nio.ByteBuffer
+import java.nio.channels.FileChannel
 import java.util.concurrent.ExecutorService
+import java.util.concurrent.Executors
 
 
 class MainActivity : AppCompatActivity(), ActivityCompat.OnRequestPermissionsResultCallback {
@@ -35,6 +49,11 @@ class MainActivity : AppCompatActivity(), ActivityCompat.OnRequestPermissionsRes
     private lateinit var cameraExecutor: ExecutorService
     private var trafficLightIsDetected = false
     private var speed = 0.0
+
+    // Surface Viewのコールバックをセット
+    private lateinit var overlaySurfaceView: OverlaySurfaceView
+    // CameraProvider
+    private lateinit var cameraProviderFuture : ListenableFuture<ProcessCameraProvider>
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -74,73 +93,78 @@ class MainActivity : AppCompatActivity(), ActivityCompat.OnRequestPermissionsRes
             }
         }
 
-        //startCamera()
+        OpenCVLoader.initDebug()
 
-        //cameraExecutor = Executors.newSingleThreadExecutor()
-    }
+        overlaySurfaceView = OverlaySurfaceView(resultView)
+        cameraExecutor = Executors.newSingleThreadExecutor()
 
-    /*
-    inner class TrafficLightAnalyzer() : ImageAnalysis.Analyzer {
-        override fun analyze(image: ImageProxy) {
+        // CameraProvider をリクエストする
+        cameraProviderFuture = ProcessCameraProvider.getInstance(this)
 
-            // convert ImageProxy to bitmap
-
-            if(trafficLightIsDetected && speed > 10.0) {
-                TODO("Not yet implemented. detect traffic light by tfFlow-light")
-            } else {
-                TODO("Not yet implemented. not in the traffic intersection, so not analyze")
-            }
-
-            runOnUiThread(Runnable() {
-                run() {
-                    TODO("bitmapをresult_image_view_mainに表示")
-                    // result_image_view_main.setImageBitmap(image)
-                }
-            })
-        }
-
+        startCamera()
     }
 
     private fun startCamera() {
         val cameraProviderFuture = ProcessCameraProvider.getInstance(this)
 
         cameraProviderFuture.addListener(Runnable {
+            // Used to bind the lifecycle of cameras to the lifecycle owner
             val cameraProvider: ProcessCameraProvider = cameraProviderFuture.get()
 
-            val preview = Preview.Builder()
+            val preview : Preview = Preview.Builder()
                 .build()
+
+            val cameraSelector : CameraSelector = CameraSelector.Builder()
+                .requireLensFacing(CameraSelector.LENS_FACING_BACK)
+                .build()
+
+            preview.setSurfaceProvider(cameraView.createSurfaceProvider())
+
+            // 画像解析(今回は物体検知)のユースケース
+            val imageAnalyzer = ImageAnalysis.Builder()
+                .setTargetRotation(cameraView.display.rotation)
+                .setBackpressureStrategy(ImageAnalysis.STRATEGY_KEEP_ONLY_LATEST) // 最新のcameraのプレビュー画像だけをを流す
+                .setTargetResolution(Size(imageProxyWidth, imageProxyHeight))
+                .build()
+                // 推論処理へ移動 (ObjectDetector.kt参照)
                 .also {
-                    it.setSurfaceProvider()
+                    it.setAnalyzer(
+                        cameraExecutor,
+
+                        // 画像解析(Analyze.kt参照)
+                        Analyze(
+                            yuvToRgbConverter,
+                            interpreter,
+                            labels,
+                            overlaySurfaceView,
+                            Size(resultView.width, resultView.height)
+                        )
+
+                    )
                 }
 
-            val imageAnalyzer = ImageAnalysis.Builder()
-                    .build()
-                    .also {
-                        it.setAnalyzer(cameraExecutor, TrafficLightAnalyzer())
-                    }
-
-            val cameraSelector = CameraSelector.DEFAULT_BACK_CAMERA
-
             try {
+                // Unbind use cases before rebinding
                 cameraProvider.unbindAll()
 
+                // Bind use cases to camera
                 cameraProvider.bindToLifecycle(
-                        this, cameraSelector, preview, imageAnalyzer)
-            } catch (exc: Exception) {
-                Log.e(TAG, "Use case binding failed", exc)
+                    this, cameraSelector, preview, imageAnalyzer)
+
+            } catch(exc: Exception) {
+                Log.e("CameraX", "Use case binding failed", exc)
             }
+
         }, ContextCompat.getMainExecutor(this))
     }
-
-     */
 
 
     /*------------- permission -------------*/
 
     override fun onRequestPermissionsResult(
-            requestCode: Int,
-            permissions: Array<String>,
-            grantResults: IntArray) {
+        requestCode: Int,
+        permissions: Array<String>,
+        grantResults: IntArray) {
 
         if(requestCode != LOCATION_PERMISSION_REQUEST_CODE) return
         if(isPermissionGranted()) {
@@ -149,8 +173,8 @@ class MainActivity : AppCompatActivity(), ActivityCompat.OnRequestPermissionsRes
             }
         } else {
             Toast.makeText(this,
-                    "位置情報の使用が拒否されたため再起動しました",
-                    Toast.LENGTH_LONG).show()
+                "位置情報の使用が拒否されたため再起動しました",
+                Toast.LENGTH_LONG).show()
             val intent = Intent(this, SetupActivity::class.java)
 
             startActivity(intent)
@@ -159,14 +183,14 @@ class MainActivity : AppCompatActivity(), ActivityCompat.OnRequestPermissionsRes
 
     private fun requestPermission() {
         ActivityCompat.requestPermissions(this,
-                REQUIRED_PERMISSIONS,
-                LOCATION_PERMISSION_REQUEST_CODE
+            REQUIRED_PERMISSIONS,
+            LOCATION_PERMISSION_REQUEST_CODE
         )
     }
 
     private fun isPermissionGranted() = REQUIRED_PERMISSIONS.all {
         ActivityCompat.checkSelfPermission(
-                this, it
+            this, it
         ) == PackageManager.PERMISSION_GRANTED
     }
 
@@ -191,9 +215,9 @@ class MainActivity : AppCompatActivity(), ActivityCompat.OnRequestPermissionsRes
     private fun startLocationUpdates() {
         val locationRequest = createLocationRequest() ?: return
         fusedLocationClient.requestLocationUpdates(
-                locationRequest,
-                locationCallback,
-                null)
+            locationRequest,
+            locationCallback,
+            null)
     }
 
     private fun stopLocationUpdates() {
@@ -210,11 +234,69 @@ class MainActivity : AppCompatActivity(), ActivityCompat.OnRequestPermissionsRes
     }
 
 
+    // tfliteモデルを扱うためのラッパーを含んだinterpreter
+    private val interpreter: Interpreter by lazy {
+        Interpreter(loadModel())
+    }
+
+    // モデルの正解ラベルリスト
+    private val labels: List<String> by lazy {
+        loadLabels()
+    }
+
+    // tfliteモデルをassetsから読み込む
+    private fun loadModel(fileName: String = MODEL_FILE_NAME): ByteBuffer {
+        lateinit var modelBuffer: ByteBuffer
+        var file: AssetFileDescriptor? = null
+        try {
+            file = assets.openFd(fileName)
+            val inputStream = FileInputStream(file.fileDescriptor)
+            val fileChannel = inputStream.channel
+            modelBuffer = fileChannel.map(FileChannel.MapMode.READ_ONLY, file.startOffset, file.declaredLength)
+        } catch (e: Exception) {
+            Toast.makeText(this, "モデルファイル読み込みエラー", Toast.LENGTH_SHORT).show()
+            finish()
+        } finally {
+            file?.close()
+        }
+        return modelBuffer
+    }
+
+    // モデルの正解ラベルデータをassetsから取得
+    private fun loadLabels(fileName: String = LABEL_FILE_NAME): List<String> {
+        var labels = listOf<String>()
+        var inputStream: InputStream? = null
+        try {
+            inputStream = assets.open(fileName)
+            val reader = BufferedReader(InputStreamReader(inputStream))
+            labels = reader.readLines()
+        } catch (e: Exception) {
+            Toast.makeText(this, "モデルデータを読み込めませんでした", Toast.LENGTH_SHORT).show()
+            finish()
+        } finally {
+            inputStream?.close()
+        }
+        return labels
+    }
+
+    // カメラのYUV画像をRGBに変換するコンバータ
+    private val yuvToRgbConverter: YuvToRgbConverter by lazy {
+        YuvToRgbConverter(this)
+    }
 
 
     companion object {
         const val TAG = "Main"
         private const val LOCATION_PERMISSION_REQUEST_CODE = 1
         private val REQUIRED_PERMISSIONS = arrayOf(Manifest.permission.ACCESS_FINE_LOCATION)
+
+        // モデル名とラベル名
+        private const val MODEL_FILE_NAME = "ssd_mobilenet_v1.tflite"
+        private const val LABEL_FILE_NAME = "coco_dataset_labels.txt"
+
+        // 取得画像解像度
+        // システムによって変更されるため、ObjectDetector.kt内で取得画像から再取得
+        private const val imageProxyWidth = 1920
+        private const val imageProxyHeight = 1080
     }
 }
