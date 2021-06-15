@@ -46,7 +46,7 @@ class ObjectDetector(
         // 検出対象
         private const val DETECTION_TARGET = "traffic light"
         // 検出結果のスコアしきい値
-        private const val SCORE_THRESHOLD = 0.1f
+        private const val SCORE_THRESHOLD = 0.3f
     }
 
     private val tfImageProcessor by lazy {
