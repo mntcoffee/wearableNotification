@@ -97,7 +97,7 @@ class Notificator(
     }
 
     private fun alert01() {
-        soundPool.play(alert1, 1.0f, 1.0f, 5, 2, 1.0f)
+        soundPool.play(alert1, 1.0f, 1.0f, 5, 0, 1.0f)
 
         // 通知の表示
         with(NotificationManagerCompat.from(context)) {
