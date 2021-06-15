@@ -33,6 +33,18 @@ class OverlaySurfaceView(surfaceView: SurfaceView) :
     }
 
     /**
+     * surfaceViewのクリア
+     */
+    fun clear(){
+        // surfaceHolder経由でキャンバス取得(画面がactiveでない時にもdrawされてしまいexception発生の可能性があるのでnullableにして以下扱ってます)
+        val canvas: Canvas? = surfaceHolder.lockCanvas()
+        // 前に描画していたものをクリア
+        canvas?.drawColor(0, PorterDuff.Mode.CLEAR)
+
+        surfaceHolder.unlockCanvasAndPost(canvas ?: return)
+    }
+
+    /**
      * surfaceViewに物体検出結果を表示
      */
     fun draw(
@@ -67,20 +79,23 @@ class OverlaySurfaceView(surfaceView: SurfaceView) :
             strokeWidth = 7f
             isAntiAlias = false
         }
-        canvas?.drawRect(Rect(ipRoi.left, ipRoi.top, ipRoi.right, ipRoi.bottom), paint)
+        canvas?.drawRect(
+            Rect(ipRoi.left, ipRoi.top, ipRoi.right, ipRoi.bottom),
+            paint
+        )
 
-//        // ROI以外を半透明にする
-//        paint.apply {
-//            color = Color.argb(127, 0, 0, 0)
-//            style = Paint.Style.FILL
-//            isAntiAlias = false
-//        }
-//        canvas?.drawRect(Rect(0, 0, ipRoi.right, ipRoi.top), paint)
-//        canvas?.drawRect(Rect(0, ipRoi.top, ipRoi.left, resultViewSize.height), paint)
-//        canvas?.drawRect(Rect(ipRoi.left, ipRoi.bottom, resultViewSize.width, resultViewSize.height), paint)
-//        canvas?.drawRect(Rect(ipRoi.right, 0, resultViewSize.width, ipRoi.bottom), paint)
-
-//        detectedObjectList.mapIndexed { i, detectionObject ->
+        // ROIのテキストを表示
+        paint.apply {
+            style = Paint.Style.FILL
+            isAntiAlias = true
+            textSize = 50f
+        }
+        canvas?.drawText(
+            "信号機を探しています・・・",
+            ipRoi.left.toFloat(),
+            ipRoi.top - 5f,
+            paint
+        )
 
         if(detectedObjectList.isNotEmpty()) {
 

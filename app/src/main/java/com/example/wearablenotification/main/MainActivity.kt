@@ -82,7 +82,7 @@ class MainActivity : AppCompatActivity(), ActivityCompat.OnRequestPermissionsRes
                     speed = location.speed * 3.6
                     Log.d(TAG, "speed: %.3f km/h".format(speed))
                     // 予測地点に交差点があるなら画像処理を行う
-                    trafficLightIsDetected = if(checkIntersections(location)) {
+                    intersectionIsNearing = if(checkIntersections(location)) {
                         Log.d(TAG, "進行方向に交差点があります")
                         true
                     } else {
@@ -292,11 +292,14 @@ class MainActivity : AppCompatActivity(), ActivityCompat.OnRequestPermissionsRes
         private const val LOCATION_PERMISSION_REQUEST_CODE = 1
         private val REQUIRED_PERMISSIONS = arrayOf(Manifest.permission.ACCESS_FINE_LOCATION)
 
-        var trafficLightIsDetected = false
+        // 信号機のある交差点付近かどうか
+        var intersectionIsNearing = false
+        // 車速
         var speed = 0.0
 
-        const val SPEED_01 = 20.0
-        const val SPEED_02 = 0.0
+        // 車速の危険度しきい値
+        const val SPEED_01 = 20.0   // パターン1(音あり通知)
+        const val SPEED_02 = 5.0    // パターン2(信号機検知開始, 通常の通知)
 
         // モデル名とラベル名
         private const val MODEL_FILE_NAME = "ssd_mobilenet_v1.tflite"

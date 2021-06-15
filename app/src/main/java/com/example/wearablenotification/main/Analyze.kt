@@ -1,7 +1,6 @@
 package com.example.android.camera.utils.com.example.trafficlightdetection
 
 import android.annotation.SuppressLint
-import android.content.Context
 import android.graphics.Bitmap
 import android.graphics.Rect
 import android.graphics.RectF
@@ -12,8 +11,8 @@ import androidx.camera.core.ImageAnalysis
 import androidx.camera.core.ImageProxy
 import com.example.wearablenotification.main.*
 import com.example.wearablenotification.main.MainActivity.Companion.SPEED_02
+import com.example.wearablenotification.main.MainActivity.Companion.intersectionIsNearing
 import com.example.wearablenotification.main.MainActivity.Companion.speed
-import com.example.wearablenotification.main.MainActivity.Companion.trafficLightIsDetected
 import org.tensorflow.lite.Interpreter
 
 /**
@@ -42,7 +41,7 @@ class Analyze(
         if (imageProxy.image == null) return
 
         //交差点判定と車速によって分岐
-        if(/*trafficLightIsDetected && */speed > SPEED_02) {
+        if(intersectionIsNearing && speed >= SPEED_02) {
 
             //取得画像の回転向き、大きさを取得
             imageRotationDegrees = imageProxy.imageInfo.rotationDegrees
@@ -93,6 +92,7 @@ class Analyze(
 
         }else{
             imageProxy.close() // imageProxyの解放 : 必ず呼ぶ
+            overlaySurfaceView.clear()  // 描画のクリア
         }
     }
 
@@ -112,8 +112,6 @@ class Analyze(
 
     // ROIで切り取る
     private fun cropBitmap(roi: RectF, targetBitmap: Bitmap): Bitmap {
-
-        Log.d("Debug", "roi : " + roi)
 
         // 型、条件に合うように整形
         val tmpRoi = Rect(
@@ -149,5 +147,9 @@ class Analyze(
         } else {
             return y
         }
+    }
+
+    companion object{
+        const val TAG = "Analyze"
     }
 }
