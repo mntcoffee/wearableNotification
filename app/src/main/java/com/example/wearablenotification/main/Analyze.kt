@@ -12,6 +12,7 @@ import androidx.camera.core.ImageProxy
 import com.example.wearablenotification.main.*
 import com.example.wearablenotification.main.MainActivity.Companion.SPEED_02
 import com.example.wearablenotification.main.MainActivity.Companion.intersectionIsNearing
+import com.example.wearablenotification.main.MainActivity.Companion.notInIntersection
 import com.example.wearablenotification.main.MainActivity.Companion.speed
 import org.tensorflow.lite.Interpreter
 
@@ -41,7 +42,7 @@ class Analyze(
         if (imageProxy.image == null) return
 
         //交差点判定と車速によって分岐
-        if(intersectionIsNearing && speed >= SPEED_02) {
+        if(intersectionIsNearing && notInIntersection && speed >= SPEED_02) {
 
             //取得画像の回転向き、大きさを取得
             imageRotationDegrees = imageProxy.imageInfo.rotationDegrees

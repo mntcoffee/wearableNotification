@@ -11,20 +11,18 @@ const val DISTANCE_LONGITUDE = 0.00054832 // 予測地点までの距離(50mの�
 const val DISTANCE_LATITUDE = 0.00045066   // 予測地点までの距離(50mの緯度)
 private val NUMBER_OF_INTERSECTIONS = intersection.count()
 
-fun checkIntersections(location: Location): Boolean {
-    val predictedLocation = calculatePredictedLocation(location)
-
+fun checkIntersections(location: LatLng): Boolean {
     // 交差点検出のフラグ
     var flag = false
     for(i in 0 until NUMBER_OF_INTERSECTIONS) {
-        if(PolyUtil.containsLocation(predictedLocation, intersection[i], true)) {
+        if(PolyUtil.containsLocation(location.latitude, location.longitude, intersection[i], true)) {
             flag = true
         }
     }
     return flag
 }
 
-private fun calculatePredictedLocation(location: Location): LatLng {
+fun calculatePredictedLocation(location: Location): LatLng {
     val degree = location.bearing * 2 * PI / 360
     val predictedLatitude = location.latitude + DISTANCE_LATITUDE * cos(degree)
     val predictedLongitude = location.longitude + DISTANCE_LONGITUDE * sin(degree)

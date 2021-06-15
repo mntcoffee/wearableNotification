@@ -7,6 +7,7 @@ import android.content.Context
 import android.content.Intent
 import android.content.pm.PackageManager
 import android.content.res.AssetFileDescriptor
+import android.location.Location
 import android.os.Bundle
 import android.util.Log
 import android.util.Size
@@ -24,9 +25,11 @@ import androidx.core.content.ContextCompat
 import com.example.android.camera.utils.com.example.trafficlightdetection.Analyze
 import com.example.android.camera.utils.com.example.trafficlightdetection.YuvToRgbConverter
 import com.example.wearablenotification.R
+import com.example.wearablenotification.main.intersection.calculatePredictedLocation
 import com.example.wearablenotification.main.intersection.checkIntersections
 import com.example.wearablenotification.setup.SetupActivity
 import com.google.android.gms.location.*
+import com.google.android.gms.maps.model.LatLng
 import com.google.common.util.concurrent.ListenableFuture
 import kotlinx.android.synthetic.main.activity_main.*
 import org.opencv.android.OpenCVLoader
@@ -82,12 +85,21 @@ class MainActivity : AppCompatActivity(), ActivityCompat.OnRequestPermissionsRes
                     speed = location.speed * 3.6
                     Log.d(TAG, "speed: %.3f km/h".format(speed))
                     // 予測地点に交差点があるなら画像処理を行う
-                    intersectionIsNearing = if(checkIntersections(location)) {
+                    val predictedLocation = calculatePredictedLocation(location)
+                    intersectionIsNearing = if(checkIntersections(predictedLocation)) {
                         Log.d(TAG, "進行方向に交差点があります")
                         true
                     } else {
                         Log.d(TAG, "交差点を探しています...")
                         false
+                    }
+                    // 現在位置が交差点内なら画像処理をやめる
+                    notInIntersection = if(checkIntersections(LatLng(location.latitude, location.longitude))) {
+                        Log.d(TAG, "交差点内にいます")
+                        false
+                    } else {
+                        Log.d(TAG, "交差点内にいません")
+                        true
                     }
                 }
             }
@@ -294,6 +306,7 @@ class MainActivity : AppCompatActivity(), ActivityCompat.OnRequestPermissionsRes
 
         // 信号機のある交差点付近かどうか
         var intersectionIsNearing = false
+        var notInIntersection = true
         // 車速
         var speed = 0.0
 
