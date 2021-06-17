@@ -51,4 +51,28 @@
         app:layout_constraintStart_toEndOf="@+id/text_view_navigation_first"
         app:layout_constraintTop_toTopOf="parent" />
 
+    <com.google.android.material.switchmaterial.SwitchMaterial
+        android:id="@+id/test_mode_switch_first_fragment"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginEnd="32dp"
+        app:layout_constraintBottom_toBottomOf="@id/next_button_first_fragment"
+        app:layout_constraintEnd_toStartOf="@id/next_button_first_fragment"
+        app:layout_constraintTop_toTopOf="@id/next_button_first_fragment" />
+
+    <TextView
+        android:id="@+id/test_mode_text_view_first_fragment"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:layout_marginEnd="8dp"
+        android:gravity="center|right"
+        android:text="@string/test_mode"
+        android:textColor="@color/white"
+        android:textSize="20sp"
+        android:textStyle="bold"
+        app:layout_constraintBottom_toBottomOf="@id/test_mode_switch_first_fragment"
+        app:layout_constraintEnd_toStartOf="@id/test_mode_switch_first_fragment"
+        app:layout_constraintStart_toEndOf="@+id/text_view_navigation_first"
+        app:layout_constraintTop_toTopOf="@id/test_mode_switch_first_fragment" />
+
 </androidx.constraintlayout.widget.ConstraintLayout>

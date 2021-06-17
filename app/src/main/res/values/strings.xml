@@ -1,5 +1,5 @@
 <resources>
-    <string name="app_name">wearableNotification</string>
+    <string name="app_name">Driving Supporter</string>
     <!-- TODO: Remove or change this placeholder text -->
     <string name="hello_blank_fragment">Hello blank fragment</string>
     <string name="next">NEXT</string>
@@ -10,6 +10,7 @@
         そのため，ウェアラブルデバイスとBluetooth接続をしてください.
         \nまた，警告音を出すためにスマートフォンのサイレント/マナーモードを解除してください．
         \n\n準備ができたらまず，右画像を参考にスマートフォンを中央部に設置してください．
+        \n\n開発者のテスト時に，車速が低くても警告を出す場合はTest ModeをONにしてください．
     </string>
 
     <string name="navigation_second">
@@ -19,4 +20,5 @@
 
     <string name="setup1">Setup1 - 取り付け位置等の確認</string>
     <string name="setup2">Setup2 - 取り付け角度の調整</string>
+    <string name="test_mode">Test Mode</string>
 </resources>

@@ -114,6 +114,8 @@ class MainActivity : AppCompatActivity(), ActivityCompat.OnRequestPermissionsRes
         cameraProviderFuture = ProcessCameraProvider.getInstance(this)
 
         startCamera()
+
+        Log.d(TAG, "speed01: $SPEED_01, soeed02: $SPEED_02")
     }
 
     private fun startCamera() {
@@ -311,8 +313,8 @@ class MainActivity : AppCompatActivity(), ActivityCompat.OnRequestPermissionsRes
         var speed = 0.0
 
         // 車速の危険度しきい値
-        const val SPEED_01 = 20.0   // パターン1(音あり通知)
-        const val SPEED_02 = 5.0    // パターン2(信号機検知開始, 通常の通知)
+        var SPEED_01 = 45.0   // パターン1(音あり通知)
+        var SPEED_02 = 10.0    // パターン2(信号機検知開始, 通常の通知)
 
         // モデル名とラベル名
         private const val MODEL_FILE_NAME = "ssd_mobilenet_v1.tflite"

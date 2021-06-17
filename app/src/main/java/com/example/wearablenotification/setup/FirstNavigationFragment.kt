@@ -4,13 +4,13 @@ import android.content.Context
 import android.media.AudioManager
 import android.os.Bundle
 import android.text.method.ScrollingMovementMethod
+import android.view.*
 import androidx.fragment.app.Fragment
-import android.view.LayoutInflater
-import android.view.View
-import android.view.ViewGroup
 import android.widget.Toast
 import androidx.navigation.fragment.findNavController
 import com.example.wearablenotification.R
+import com.example.wearablenotification.main.MainActivity.Companion.SPEED_01
+import com.example.wearablenotification.main.MainActivity.Companion.SPEED_02
 import kotlinx.android.synthetic.main.fragment_first_navigation.view.*
 
 
@@ -51,6 +51,16 @@ class FirstNavigationFragment : Fragment() {
                     // normal
                     findNavController().navigate(R.id.action_firstNavigationFragment_to_secondNavigationFragment)
                 }
+            }
+        }
+
+        view.test_mode_switch_first_fragment.setOnCheckedChangeListener { _, isChecked ->
+            if(isChecked) {
+                SPEED_01 = 20.0
+                SPEED_02 = 5.0
+            } else {
+                SPEED_01 = 45.0
+                SPEED_02 = 10.0
             }
         }
 
