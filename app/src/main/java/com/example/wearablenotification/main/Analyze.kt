@@ -1,15 +1,14 @@
-package com.example.android.camera.utils.com.example.trafficlightdetection
+package com.example.wearablenotification.main
 
 import android.annotation.SuppressLint
 import android.graphics.Bitmap
 import android.graphics.Rect
 import android.graphics.RectF
 import android.media.Image
-import android.util.Log
 import android.util.Size
 import androidx.camera.core.ImageAnalysis
 import androidx.camera.core.ImageProxy
-import com.example.wearablenotification.main.*
+import com.example.android.camera.utils.com.example.trafficlightdetection.YuvToRgbConverter
 import com.example.wearablenotification.main.MainActivity.Companion.SPEED_02
 import com.example.wearablenotification.main.MainActivity.Companion.intersectionIsNearing
 import com.example.wearablenotification.main.MainActivity.Companion.notInIntersection
@@ -42,7 +41,7 @@ class Analyze(
         if (imageProxy.image == null) return
 
         //交差点判定と車速によって分岐
-        if(intersectionIsNearing && notInIntersection && speed >= SPEED_02) {
+        if( intersectionIsNearing && notInIntersection && speed >= SPEED_02 ) {
 
             //取得画像の回転向き、大きさを取得
             imageRotationDegrees = imageProxy.imageInfo.rotationDegrees
