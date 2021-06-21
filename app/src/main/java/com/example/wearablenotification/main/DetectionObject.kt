@@ -7,6 +7,6 @@ import android.graphics.RectF
  */
 data class DetectionObject(
     val score: Float,
-    val label: String,
+    var label: String,
     var boundingBox: RectF
 )

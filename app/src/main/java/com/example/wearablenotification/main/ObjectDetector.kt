@@ -18,7 +18,6 @@ import org.tensorflow.lite.support.image.ops.Rot90Op
 
 /**
  * CameraXの物体検知の画像解析ユースケース
- * @param yuvToRgbConverter カメラ画像のImageバッファYUV_420_888からRGB形式に変換する
  * @param interpreter tfliteモデルを操作するライブラリ
  * @param labels 正解ラベルのリスト
  * @param imageRotationDegrees

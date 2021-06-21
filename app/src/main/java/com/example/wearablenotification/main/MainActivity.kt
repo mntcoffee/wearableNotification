@@ -7,7 +7,6 @@ import android.content.Context
 import android.content.Intent
 import android.content.pm.PackageManager
 import android.content.res.AssetFileDescriptor
-import android.location.Location
 import android.os.Bundle
 import android.util.Log
 import android.util.Size
@@ -19,10 +18,7 @@ import androidx.camera.core.ImageAnalysis
 import androidx.camera.core.Preview
 import androidx.camera.lifecycle.ProcessCameraProvider
 import androidx.core.app.ActivityCompat
-import androidx.core.app.NotificationCompat
-import androidx.core.app.NotificationManagerCompat
 import androidx.core.content.ContextCompat
-import com.example.android.camera.utils.com.example.trafficlightdetection.Analyze
 import com.example.android.camera.utils.com.example.trafficlightdetection.YuvToRgbConverter
 import com.example.wearablenotification.R
 import com.example.wearablenotification.main.intersection.calculatePredictedLocation
@@ -126,6 +122,7 @@ class MainActivity : AppCompatActivity(), ActivityCompat.OnRequestPermissionsRes
             val cameraProvider: ProcessCameraProvider = cameraProviderFuture.get()
 
             val preview : Preview = Preview.Builder()
+                .setTargetResolution(Size(imageProxyWidth, imageProxyHeight))
                 .build()
 
             val cameraSelector : CameraSelector = CameraSelector.Builder()

@@ -127,7 +127,7 @@ class Notificator(
         // パターン1
         const val CHANNEL_ID_1 = "channel_01"
         const val TITLE_1 = "赤信号通知"
-        const val TEXT_1 = "赤信号です"
+        const val TEXT_1 = "危険です"
         val VIBRATIONPATTERN_1 = longArrayOf(0, 200, 25, 200, 25, 1000)
 
         // パターン2
