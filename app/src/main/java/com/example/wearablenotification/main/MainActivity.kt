@@ -89,6 +89,7 @@ class MainActivity : AppCompatActivity(), ActivityCompat.OnRequestPermissionsRes
                         Log.d(TAG, "交差点を探しています...")
                         false
                     }
+                    /*
                     // 現在位置が交差点内なら画像処理をやめる
                     notInIntersection = if(checkIntersections(LatLng(location.latitude, location.longitude))) {
                         Log.d(TAG, "交差点内にいます")
@@ -97,6 +98,8 @@ class MainActivity : AppCompatActivity(), ActivityCompat.OnRequestPermissionsRes
                         Log.d(TAG, "交差点内にいません")
                         true
                     }
+
+                     */
                 }
             }
         }

@@ -46,6 +46,22 @@ class ObjectDetector(
         private const val DETECTION_TARGET = "traffic light"
         // 検出結果のスコアしきい値
         private const val SCORE_THRESHOLD = 0.3f
+
+
+        // 信号機の色の閾値
+        private const val MIN_H_RED = 0.0
+        private const val MIN_S_RED = 100.0
+        private const val MIN_V_RED = 100.0
+        private const val MAX_H_RED = 10.0
+        private const val MAX_S_RED = 255.0
+        private const val MAX_V_RED = 255.0
+
+        private const val MIN_H_BLUE = 80.0
+        private const val MIN_S_BLUE = 160.0
+        private const val MIN_V_BLUE = 100.0
+        private const val MAX_H_BLUE = 105.0
+        private const val MAX_S_BLUE = 210.0
+        private const val MAX_V_BLUE = 160.0
     }
 
     private val tfImageProcessor by lazy {
@@ -139,7 +155,7 @@ class ObjectDetector(
 
 
     // ===== 色判定処理 =====
-    fun analyzeTrafficColor(inputImage: Bitmap): Boolean{
+    fun analyzeTrafficColor(inputImage: Bitmap): Int{
 
         // bitmap to mat(rgb)
         val inputMat = Mat()
@@ -147,20 +163,35 @@ class ObjectDetector(
 
         // convert rgb to hsv
         Imgproc.cvtColor(inputMat, inputMat, Imgproc.COLOR_RGB2HSV)
-        val outputMat = Mat()
 
+        val outputMatRed = Mat()
+        val outputMatBlue = Mat()
         // only show the red area
-        Core.inRange(inputMat, Scalar(0.0, 100.0, 100.0), Scalar(10.0, 255.0, 255.0), outputMat)
-        Log.d(TAG, "row: ${outputMat.rows()}, col: ${outputMat.cols()}")
-        Log.d(TAG, "all number: ${outputMat.rows() * outputMat.cols()}")
+        Core.inRange(
+            inputMat,
+            Scalar(MIN_H_RED, MIN_S_RED, MIN_V_RED),
+            Scalar(MAX_H_RED, MAX_S_RED, MAX_V_RED),
+            outputMatRed)
+
+        Core.inRange(
+            inputMat,
+            Scalar(MIN_H_BLUE, MIN_S_BLUE, MIN_V_BLUE),
+            Scalar(MAX_H_BLUE, MAX_S_BLUE, MAX_V_BLUE),
+            outputMatBlue)
+//        Log.d(TAG, "row: ${outputMatRed.rows()}, col: ${outputMatRed.cols()}")
+//        Log.d(TAG, "all number: ${outputMatRed.rows() * outputMatRed.cols()}")
 
         // remove noises
         //Imgproc.blur(outputMat, outputMat, Size(10.0, 10.0))
 
         // convert output to binary
-        Imgproc.threshold(outputMat, outputMat, 80.0, 255.0, Imgproc.THRESH_BINARY)
+        //Imgproc.threshold(outputMat, outputMat, 80.0, 255.0, Imgproc.THRESH_BINARY)
 
-        return voteTrafficColor(outputMat)
+        return when {
+            voteTrafficColor(outputMatRed) -> 1
+            voteTrafficColor(outputMatBlue) -> 2
+            else -> 0
+        }
     }
 
     private fun voteTrafficColor(image: Mat): Boolean {

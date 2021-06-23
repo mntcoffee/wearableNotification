@@ -66,8 +66,24 @@ class Analyze(
             // 確率の高い順に格納されている
             val detectedObjectList = objectDetector.detect(roiBitmap)
 
+            /**
+             * [TODO]
+             * 今までは赤信号か否かのbooleanだったが，
+             * objectDetector.analyzeTrafficColor(trafficLightBitmap)
+             * の返り値は0, 1, 2のどれかになっている
+             * 値の意味はすぐ下のtrafficLightColorを参照
+             *
+             * ついでに，自分の位置が交差点に入ってたら処理しない処理はいったん消去してます．
+             * ちゃんとした交差点のポリゴンを来月実装します
+             */
             // 赤信号フラグ
+            // ↓消去
             var redIsLighting = false
+            // 信号機のフラグ
+            // 0 : 赤でも青でもない．白いROIのまま
+            // 1 : 赤．赤いROI
+            // 2 : 青．緑のROI
+            var trafficLightColor = 0
 
             // 信号機色判定処理(検知された場合のみ実行)
             if (detectedObjectList.isNotEmpty()) {
