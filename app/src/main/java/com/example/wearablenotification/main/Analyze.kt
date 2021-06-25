@@ -41,7 +41,7 @@ class Analyze(
         if (imageProxy.image == null) return
 
         //交差点判定と車速によって分岐
-        if( true){//intersectionIsNearing && notInIntersection && speed >= SPEED_02 ) {
+        if( intersectionIsNearing && notInIntersection && speed >= SPEED_02 ) {
 
             //取得画像の回転向き、大きさを取得
             imageRotationDegrees = imageProxy.imageInfo.rotationDegrees
