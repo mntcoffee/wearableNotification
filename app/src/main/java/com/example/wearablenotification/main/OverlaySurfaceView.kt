@@ -21,6 +21,7 @@ class OverlaySurfaceView(surfaceView: SurfaceView) :
         const val TEXT_DETECTING = "信号機を探しています・・・"
         const val TEXT_TRAFFICLIGHT = "信号"
         const val TEXT_REDLIGHT = "赤信号"
+        const val TEXT_GREENLIGHT = "青信号"
     }
 
     init {
@@ -60,7 +61,7 @@ class OverlaySurfaceView(surfaceView: SurfaceView) :
     fun draw(
         roi: RectF,
         detectedObjectList: List<DetectionObject>,
-        redIsLighting : Boolean,
+        trafficLightColor : Int,
         imageProxySize: Size,
         resultViewSize: Size
     ) {
@@ -122,8 +123,10 @@ class OverlaySurfaceView(surfaceView: SurfaceView) :
         if(detectedObjectList.isNotEmpty()) {
 
             // ラベル名を更新
-            detectedObjectList[0].label = if (redIsLighting) {
+            detectedObjectList[0].label = if (trafficLightColor == 1) {
                 TEXT_REDLIGHT
+            } else if (trafficLightColor == 2) {
+                TEXT_GREENLIGHT
             } else {
                 TEXT_TRAFFICLIGHT
             }
@@ -140,11 +143,14 @@ class OverlaySurfaceView(surfaceView: SurfaceView) :
 
             // バウンディングボックスの表示
             paint.apply {
-                color = if (redIsLighting) {
+                color = if (trafficLightColor == 1) {
                     Color.RED
-                } else {
+                } else if (trafficLightColor == 2) {
                     Color.GREEN
+                } else {
+                    Color.GRAY
                 }
+
                 style = Paint.Style.STROKE
                 strokeWidth = 7f
                 isAntiAlias = false

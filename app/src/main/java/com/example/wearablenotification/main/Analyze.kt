@@ -76,9 +76,6 @@ class Analyze(
              * ついでに，自分の位置が交差点に入ってたら処理しない処理はいったん消去してます．
              * ちゃんとした交差点のポリゴンを来月実装します
              */
-            // 赤信号フラグ
-            // ↓消去
-            var redIsLighting = false
             // 信号機のフラグ
             // 0 : 赤でも青でもない．白いROIのまま
             // 1 : 赤．赤いROI
@@ -89,11 +86,11 @@ class Analyze(
             if (detectedObjectList.isNotEmpty()) {
                 // 最も確率の高い部分のみ抜き出す
                 val trafficLightBitmap = cropBitmap(detectedObjectList[0].boundingBox, roiBitmap)
-                redIsLighting = objectDetector.analyzeTrafficColor(trafficLightBitmap)
+                trafficLightColor = objectDetector.analyzeTrafficColor(trafficLightBitmap)
             }
 
             // 警告通知処理
-            if(redIsLighting){
+            if(trafficLightColor == 1){
                 notificator.alertDriver()
             }
 
@@ -101,7 +98,7 @@ class Analyze(
             overlaySurfaceView.draw(
                 roi,
                 detectedObjectList,
-                redIsLighting,
+                trafficLightColor,
                 imageProxySize,
                 resultViewSize
             )
