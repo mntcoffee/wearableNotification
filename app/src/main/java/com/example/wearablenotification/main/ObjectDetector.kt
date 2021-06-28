@@ -51,17 +51,17 @@ class ObjectDetector(
         // 信号機の色の閾値
         private const val MIN_H_RED = 0.0
         private const val MIN_S_RED = 100.0
-        private const val MIN_V_RED = 100.0
+        private const val MIN_V_RED = 50.0
         private const val MAX_H_RED = 10.0
         private const val MAX_S_RED = 255.0
         private const val MAX_V_RED = 255.0
 
-        private const val MIN_H_BLUE = 80.0
-        private const val MIN_S_BLUE = 160.0
-        private const val MIN_V_BLUE = 100.0
-        private const val MAX_H_BLUE = 105.0
-        private const val MAX_S_BLUE = 210.0
-        private const val MAX_V_BLUE = 160.0
+        private const val MIN_H_BLUE = 65.0
+        private const val MIN_S_BLUE = 60.0
+        private const val MIN_V_BLUE = 50.0
+        private const val MAX_H_BLUE = 95.0
+        private const val MAX_S_BLUE = 255.0
+        private const val MAX_V_BLUE = 255.0
     }
 
     private val tfImageProcessor by lazy {

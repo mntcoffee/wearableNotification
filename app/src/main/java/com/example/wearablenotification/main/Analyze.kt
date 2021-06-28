@@ -41,7 +41,7 @@ class Analyze(
         if (imageProxy.image == null) return
 
         //交差点判定と車速によって分岐
-        if( intersectionIsNearing && notInIntersection && speed >= SPEED_02 ) {
+        if(intersectionIsNearing && notInIntersection && speed >= SPEED_02) {
 
             //取得画像の回転向き、大きさを取得
             imageRotationDegrees = imageProxy.imageInfo.rotationDegrees
@@ -66,16 +66,7 @@ class Analyze(
             // 確率の高い順に格納されている
             val detectedObjectList = objectDetector.detect(roiBitmap)
 
-            /**
-             * [TODO]
-             * 今までは赤信号か否かのbooleanだったが，
-             * objectDetector.analyzeTrafficColor(trafficLightBitmap)
-             * の返り値は0, 1, 2のどれかになっている
-             * 値の意味はすぐ下のtrafficLightColorを参照
-             *
-             * ついでに，自分の位置が交差点に入ってたら処理しない処理はいったん消去してます．
-             * ちゃんとした交差点のポリゴンを来月実装します
-             */
+
             // 信号機のフラグ
             // 0 : 赤でも青でもない．白いROIのまま
             // 1 : 赤．赤いROI

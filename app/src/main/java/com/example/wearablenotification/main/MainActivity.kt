@@ -23,6 +23,7 @@ import com.example.android.camera.utils.com.example.trafficlightdetection.YuvToR
 import com.example.wearablenotification.R
 import com.example.wearablenotification.main.intersection.calculatePredictedLocation
 import com.example.wearablenotification.main.intersection.checkIntersections
+import com.example.wearablenotification.main.intersection.checkIntersectionsCore
 import com.example.wearablenotification.setup.SetupActivity
 import com.google.android.gms.location.*
 import com.google.android.gms.maps.model.LatLng
@@ -89,9 +90,8 @@ class MainActivity : AppCompatActivity(), ActivityCompat.OnRequestPermissionsRes
                         Log.d(TAG, "交差点を探しています...")
                         false
                     }
-                    /*
                     // 現在位置が交差点内なら画像処理をやめる
-                    notInIntersection = if(checkIntersections(LatLng(location.latitude, location.longitude))) {
+                    notInIntersection = if(checkIntersectionsCore(LatLng(location.latitude, location.longitude))) {
                         Log.d(TAG, "交差点内にいます")
                         false
                     } else {
@@ -99,7 +99,6 @@ class MainActivity : AppCompatActivity(), ActivityCompat.OnRequestPermissionsRes
                         true
                     }
 
-                     */
                 }
             }
         }
