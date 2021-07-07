@@ -91,14 +91,14 @@ class MainActivity : AppCompatActivity(), ActivityCompat.OnRequestPermissionsRes
                         false
                     }
                     // 現在位置が交差点内なら画像処理をやめる
-                    notInIntersection = if(checkIntersectionsCore(LatLng(location.latitude, location.longitude))) {
+                    currentLocation = LatLng(location.latitude, location.longitude)
+                    notInIntersection = if(checkIntersectionsCore(currentLocation)) {
                         Log.d(TAG, "交差点内にいます")
                         false
                     } else {
                         Log.d(TAG, "交差点内にいません")
                         true
                     }
-
                 }
             }
         }
@@ -305,6 +305,10 @@ class MainActivity : AppCompatActivity(), ActivityCompat.OnRequestPermissionsRes
         private const val LOCATION_PERMISSION_REQUEST_CODE = 1
         private val REQUIRED_PERMISSIONS = arrayOf(Manifest.permission.ACCESS_FINE_LOCATION)
 
+        // 現在位置
+        var currentLocation = LatLng(0.0, 0.0)
+        // 現在の交差点
+        var currentIntersection = -1
         // 信号機のある交差点付近かどうか
         var intersectionIsNearing = false
         var notInIntersection = true

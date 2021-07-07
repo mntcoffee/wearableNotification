@@ -4,16 +4,25 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:background="#2B2828"
     tools:context=".main.MainActivity">
 
     <androidx.camera.view.PreviewView
         android:id="@+id/cameraView"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent" />
+        android:layout_width="640dp"
+        android:layout_height="360dp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
 
     <SurfaceView
         android:id="@+id/resultView"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent" />
+        android:layout_width="640dp"
+        android:layout_height="360dp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

@@ -5,11 +5,14 @@ import android.graphics.Bitmap
 import android.graphics.Rect
 import android.graphics.RectF
 import android.media.Image
+import android.util.Log
 import android.util.Size
 import androidx.camera.core.ImageAnalysis
 import androidx.camera.core.ImageProxy
 import com.example.android.camera.utils.com.example.trafficlightdetection.YuvToRgbConverter
 import com.example.wearablenotification.main.MainActivity.Companion.SPEED_02
+import com.example.wearablenotification.main.MainActivity.Companion.currentIntersection
+import com.example.wearablenotification.main.MainActivity.Companion.currentLocation
 import com.example.wearablenotification.main.MainActivity.Companion.intersectionIsNearing
 import com.example.wearablenotification.main.MainActivity.Companion.notInIntersection
 import com.example.wearablenotification.main.MainActivity.Companion.speed
@@ -35,13 +38,21 @@ class Analyze(
 ) : ImageAnalysis.Analyzer {
 
     private var imageRotationDegrees: Int = 0
+    private var flameCount = 0
+    private var redCount = 0
 
     @SuppressLint("UnsafeExperimentalUsageError")
     override fun analyze(imageProxy: ImageProxy) {
         if (imageProxy.image == null) return
 
         //交差点判定と車速によって分岐
-        if(intersectionIsNearing && notInIntersection && speed >= SPEED_02) {
+        if(true/*intersectionIsNearing && notInIntersection && speed >= SPEED_02*/) {
+            flameCount++
+            // 10フレームを超えたらリセットする
+            if(flameCount > 10) {
+                flameCount = 1
+                redCount = 0
+            }
 
             //取得画像の回転向き、大きさを取得
             imageRotationDegrees = imageProxy.imageInfo.rotationDegrees
@@ -78,12 +89,22 @@ class Analyze(
                 // 最も確率の高い部分のみ抜き出す
                 val trafficLightBitmap = cropBitmap(detectedObjectList[0].boundingBox, roiBitmap)
                 trafficLightColor = objectDetector.analyzeTrafficColor(trafficLightBitmap)
+
+                // テストのために現在地を出力
+                Log.d("Test1", "交差点番号：$currentIntersection, 座標：${currentLocation.latitude}, ${currentLocation.longitude}")
             }
 
             // 警告通知処理
             if(trafficLightColor == 1){
-                notificator.alertDriver()
+                redCount++
+                // 10フレーム中赤信号が6以上なら警告する
+                // 10フレームに一回警告をだす
+                if(redCount > 5 && flameCount == 10) {
+                    notificator.alertDriver()
+                    Log.d("test2", "alert!")
+                }
             }
+            Log.d("test2", "flamecount: $flameCount, redcount: $redCount")
 
             // 検出結果の表示(OverlaySurfaceView.kt参照)
             overlaySurfaceView.draw(
@@ -97,6 +118,8 @@ class Analyze(
         }else{
             imageProxy.close() // imageProxyの解放 : 必ず呼ぶ
             overlaySurfaceView.clear()  // 描画のクリア
+            flameCount = 0 // フレームカウントの初期化
+            redCount = 0    // 赤信号カウントの初期化
         }
     }
 

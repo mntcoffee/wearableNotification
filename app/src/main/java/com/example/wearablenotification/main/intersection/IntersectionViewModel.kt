@@ -1,6 +1,7 @@
 package com.example.wearablenotification.main.intersection
 
 import android.location.Location
+import com.example.wearablenotification.main.MainActivity.Companion.currentIntersection
 import com.google.android.gms.maps.model.LatLng
 import com.google.maps.android.PolyUtil
 import kotlin.math.PI
@@ -18,8 +19,10 @@ fun checkIntersections(location: LatLng): Boolean {
     for(i in 0 until NUMBER_OF_INTERSECTIONS) {
         if(PolyUtil.containsLocation(location.latitude, location.longitude, intersection[i], true)) {
             flag = true
+            currentIntersection = i
         }
     }
+    if(!flag) currentIntersection = -1
     return flag
 }
 
