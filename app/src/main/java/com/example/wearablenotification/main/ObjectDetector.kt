@@ -33,9 +33,16 @@ class ObjectDetector(
         private const val TAG = "ObjectDetector"
 
         // モデルのinputとoutputサイズ
+
+        // ssd_mobilenet_v1.tflite
         private const val IMG_SIZE_X = 300
         private const val IMG_SIZE_Y = 300
         private const val MAX_DETECTION_NUM = 10
+
+        // ssd_mobilenet_v3.tflite
+//        private const val IMG_SIZE_X = 320f
+//        private const val IMG_SIZE_Y = 320f
+//        private const val MAX_DETECTION_NUM = 100
 
         // 今回使うtfliteモデルは量子化済みなのでnormalize関連は127.5fではなく以下の通り
         private const val NORMALIZE_MEAN = 0f
@@ -67,7 +74,7 @@ class ObjectDetector(
     private val tfImageProcessor by lazy {
 
         ImageProcessor.Builder()
-            .add(ResizeOp(IMG_SIZE_X, IMG_SIZE_Y, ResizeOp.ResizeMethod.BILINEAR)) // モデルのinputに合うように画像のリサイズ
+            .add(ResizeOp(IMG_SIZE_X.toInt(), IMG_SIZE_Y.toInt(), ResizeOp.ResizeMethod.BILINEAR)) // モデルのinputに合うように画像のリサイズ
             .add(Rot90Op(-imageRotationDegrees / 90)) // 流れてくるImageProxyは90度回転しているのでその補正
             .add(NormalizeOp(NORMALIZE_MEAN, NORMALIZE_STD)) // normalization関連
             .build()

@@ -321,6 +321,7 @@ class MainActivity : AppCompatActivity(), ActivityCompat.OnRequestPermissionsRes
 
         // モデル名とラベル名
         private const val MODEL_FILE_NAME = "ssd_mobilenet_v1.tflite"
+        //private const val MODEL_FILE_NAME = "ssd_mobilenet_v3.tflite"
         private const val LABEL_FILE_NAME = "coco_dataset_labels.txt"
 
         // 取得画像解像度
