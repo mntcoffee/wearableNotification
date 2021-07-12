@@ -46,10 +46,10 @@ class Analyze(
         if (imageProxy.image == null) return
 
         //交差点判定と車速によって分岐
-        if(true/*intersectionIsNearing && notInIntersection && speed >= SPEED_02*/) {
+        if(intersectionIsNearing && notInIntersection && speed >= SPEED_02) {
             flameCount++
             // 10フレームを超えたらリセットする
-            if(flameCount > 10) {
+            if(flameCount > 5) {
                 flameCount = 1
                 redCount = 0
             }
@@ -97,9 +97,9 @@ class Analyze(
             // 警告通知処理
             if(trafficLightColor == 1){
                 redCount++
-                // 10フレーム中赤信号が6以上なら警告する
-                // 10フレームに一回警告をだす
-                if(redCount > 5 && flameCount == 10) {
+                // 5フレーム中赤信号が3以上なら警告する
+                // 5フレームに一回警告をだす
+                if(redCount > 3 && flameCount == 5) {
                     notificator.alertDriver()
                     Log.d("test2", "alert!")
                 }
